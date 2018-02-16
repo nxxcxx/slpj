@@ -6,26 +6,13 @@
 			<input v-model="user.password" placeholder="Password" type="password">
 			<button v-on:click="signin" type="submit">SIGN IN</button>
 		</form>
+		{{ errmsg }}
   </div>
 </template>
 
 <script>
 
-let storage = window.localStorage
-
-function setToken( token ) {
-	storage.setItem( 'JWT', token )
-}
-
-function getToken() {
-	return storage.getItem( 'JWT' )
-}
-
-function removeToken() {
-	storage.removeItem( 'JWT' )
-}
-
-import axios from 'axios'
+import auth from './auth.js'
 
 export default {
   name: 'Signin',
@@ -40,16 +27,13 @@ export default {
 	},
 	methods: {
 		signin() {
-			axios.post( 'http://localhost:8001/signin', this.user )
-			.then( res => {
-				console.log( res )
-				setToken( res.data.token )
-				this.$router.push( '/' )
-			} )
-			.catch( err => {
-				console.log( err )
-				removeToken()
-			} )
+			auth.signin( this.user )
+				.then( () => {
+					this.$router.push( '/private' )
+				} )
+				.catch( () => {
+					this.errmsg = 'login failed.'
+				} )
 		}
 	}
 }
