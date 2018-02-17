@@ -1,5 +1,5 @@
 <template>
-  <div id="Signin">
+	<div id="Signin">
 		SIGNIN
 		<form>
 			<input v-model="user.email" placeholder="Email">
@@ -7,7 +7,7 @@
 			<button v-on:click="signin" type="submit">SIGN IN</button>
 		</form>
 		{{ errmsg }}
-  </div>
+	</div>
 </template>
 
 <script>
@@ -15,7 +15,7 @@
 import auth from './auth.js'
 
 export default {
-  name: 'Signin',
+	name: 'Signin',
 	data() {
 		return {
 			user: {

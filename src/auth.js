@@ -4,9 +4,8 @@ import q from 'q'
 axios.interceptors.request.use( function ( config ) {
 	if ( config.requireAuth ) {
 		let token = localStorage.getItem( 'JWT' )
-		if ( token ) {
+		if ( token )
 			config.headers.Authorization = `Bearer ${token}`
-		}
 	}
 	return config
 }, function ( err ) {

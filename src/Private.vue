@@ -1,20 +1,20 @@
 <template>
-  <div id="Private">
-    PRIVATE
+	<div id="Private">
+		PRIVATE
 		<pre>{{ profile }}</pre>
-  </div>
+	</div>
 </template>
 
 <script>
 import axios from 'axios'
 
 export default {
-  name: 'Private',
-  data() {
-    return {
+	name: 'Private',
+	data() {
+		return {
 			profile: {}
-    }
-  },
+		}
+	},
 	mounted() {
 		axios.get( 'http://localhost:8001/profile', { requireAuth: true } )
 		.then( res => {
