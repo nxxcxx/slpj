@@ -4,9 +4,9 @@
 			<li>
 				<router-link to="/">HOME</router-link>
 				<router-link to="/users">USERS</router-link>
-				<router-link to="/signin">SINGIN</router-link>
-				<router-link to="/private">PRIVATE</router-link>
-				<router-link to="/signout">SIGNOUT</router-link>
+				<router-link to="/signin" v-if="!isAuthenticated" >SINGIN</router-link>
+				<router-link to="/private" v-if="isAuthenticated" >PRIVATE</router-link>
+				<router-link to="/signout" v-if="isAuthenticated" >SIGNOUT</router-link>
 			</li>
 		</ul>
 	</div>
@@ -17,7 +17,10 @@ import auth from './auth'
 
 export default {
 	name: 'NavBar',
-	methods: {
+	computed: {
+		isAuthenticated: function () {
+			return auth.isAuthenticated()
+		}
 	}
 }
 </script>

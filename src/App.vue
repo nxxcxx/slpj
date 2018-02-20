@@ -7,11 +7,15 @@
 
 <script>
 import NavBar from './NavBar.vue'
+import auth from './auth.js'
 
 export default {
 	name: 'app',
 	components: {
 		NavBar
+	},
+	beforeCreate() {
+		auth.authenticate( true )
 	}
 }
 </script>
@@ -21,7 +25,8 @@ body
 	margin: 0px
 ul
 	list-style-type: none
-	padding: 0
+	margin: 0px
+	padding: 0px
 li
 	display: inline-block
 	margin: 0 10px

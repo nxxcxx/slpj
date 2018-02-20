@@ -1,5 +1,6 @@
 import axios from 'axios'
 import q from 'q'
+import store from './store.js'
 
 axios.interceptors.request.use( function ( config ) {
 	if ( config.requireAuth ) {
@@ -13,21 +14,29 @@ axios.interceptors.request.use( function ( config ) {
 	return Promise.reject( err )
 } )
 
-function authenticate() {
-	const deferred = q.defer()
-	axios.get( 'http://localhost:8001/auth', { requireAuth: true } )
-	.then( res => {
-		deferred.resolve( true )
-	} )
-	.catch( err => {
-		console.log( err )
-		deferred.reject( err )
-	} )
-	return deferred.promise
+function authenticate( force ) {
+	let def = q.defer()
+	if ( force )
+		store.dispatch( 'resetUser' )
+	if ( store.state.user ) {
+		def.resolve( true )
+	} else {
+		axios.get( 'http://localhost:8001/auth', { requireAuth: true } )
+		.then( res => {
+			store.commit( 'setUser', { user: res.data.userId } )
+			def.resolve( true )
+		} )
+		.catch( err => {
+			def.reject( err )
+		} )
+	}
+	return def.promise
+	// return def.promise.delay( 1000 )
 }
 
 function deauthenticate() {
 	localStorage.removeItem( 'JWT' )
+	store.dispatch( 'resetUser' )
 }
 
 function signin( userCredentials ) {
@@ -35,6 +44,8 @@ function signin( userCredentials ) {
 	axios.post( 'http://localhost:8001/signin', userCredentials )
 	.then( res => {
 		setToken( res.data.token )
+		store.commit( 'setUser', { user: res.data.user._id } )
+		console.log( res.data )
 		deferred.resolve( true )
 	} )
 	.catch( err => {
@@ -43,6 +54,10 @@ function signin( userCredentials ) {
 		deferred.reject( err )
 	} )
 	return deferred.promise
+}
+
+function isAuthenticated() {
+	return store.state.user !== null
 }
 
 function setToken( token ) {
@@ -56,5 +71,6 @@ function getToken() {
 export default {
 	authenticate,
 	deauthenticate,
-	signin
+	signin,
+	isAuthenticated
 }

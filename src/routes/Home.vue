@@ -6,7 +6,7 @@
 
 <script>
 import axios from 'axios'
-import auth from './auth.js'
+import auth from '../auth.js'
 
 export default {
 	name: 'Home',
