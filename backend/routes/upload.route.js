@@ -5,13 +5,14 @@ const router = require( 'express' ).Router()
 const Image = require( '../models/image.js' )
 const jwtUtil = require( '../jwtUtil.js' )
 const multer = require( 'multer' )
+const del = require( 'del' )
 
 let upload = multer( {
 	dest: './uploads/',
 } )
 
-router.route( '/upload/photo' )
-	.post( upload.single( 'photo' ),
+router.route( '/upload/image' )
+	.post( upload.single( 'img' ),
 	function ( req, res, next ) {
 		jwtUtil.verify( req, res, function ( err, payload ) {
 			req.userId = payload.userId
@@ -19,14 +20,24 @@ router.route( '/upload/photo' )
 		} )
 	},
 	function ( req, res ) {
+		let imgIdx = req.query.idx
 		let imgMeta = {
 			userId: req.userId,
 			path: req.file.path,
 			originalName: req.file.originalName
 		}
-		Image.create( imgMeta, function ( err ) {
+		// Image.create( imgMeta, function ( err ) {
+		// 	if ( err ) return res.status( 500 ).send( err )
+		// 	return res.status( 200 ).send( req.file )
+		// } )
+		Image.findOneAndUpdate( { userId: req.userId, idx: req.query.idx },
+		{ $set: { path: imgMeta.path, originalName: imgMeta.originalName } },
+		{ upsert: true },
+		function ( err, oldImg ) {
 			if ( err ) return res.status( 500 ).send( err )
-			return res.status( 200 ).send( req.file )
+			del( oldImg.path ) // delete old img in the uploads folder
+			console.log( oldImg )
+			return res.status( 200 ).send( oldImg )
 		} )
 	} )
 

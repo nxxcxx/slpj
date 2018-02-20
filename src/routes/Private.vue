@@ -6,8 +6,8 @@
 			<span>UPLOAP IMAGES</span>
 			<div class="dropbox">
 				<input class="inputFile"
-					type="file" name="photo" accept="image/*"
-					@change="onImageChosen( $event.target.name, $event.target.files )"
+					type="file" name="img" accept="image/*"
+					@change="onImageChosen( $event.target.name, $event.target.files, { idx: 1 } )"
 				>
 			</div>
 		</form>
@@ -37,17 +37,19 @@ export default {
 		} )
 	},
 	methods: {
-		onImageChosen( fieldName, fileList ) {
-			console.log( fileList )
+		onImageChosen( fieldName, fileList, meta ) {
 			let formData = new FormData()
 			formData.append( fieldName, fileList[ 0 ], fileList[ 0 ].name )
-			// todo startLoadingAnimation
-			axios.post( 'http://localhost:8001/upload/photo', formData, { requireAuth: true } )
-				.then( res => {
-					// todo endLoadinAnimation
-					this.loadUserImages()
-				} )
-				.catch( err => console.log( err ) )
+			axios.request( {
+				url: 'http://localhost:8001/upload/image',
+				method: 'post',
+				data: formData,
+				requireAuth: true,
+				params: { idx: 0 }
+			} ).then( res => {
+				// todo endLoadinAnimation
+				this.loadUserImages()
+			} ).catch( err => console.log( err ) )
 		},
 		loadUserImages() {
 			axios.get( `http://localhost:8001/user/${this.user._id}/images` )
