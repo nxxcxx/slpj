@@ -3,11 +3,13 @@
 		PRIVATE
 		<pre>{{ user }}</pre>
 		<form enctype="multipart/form-data" novalidate>
-			<span>UPLOAP PHOTO</span>
-			<input
-				type="file" name="photo" accept="image/*"
-				@change="onImageChosen( $event.target.name, $event.target.files )"
-			>
+			<span>UPLOAP IMAGES</span>
+			<div class="dropbox">
+				<input class="inputFile"
+					type="file" name="photo" accept="image/*"
+					@change="onImageChosen( $event.target.name, $event.target.files )"
+				>
+			</div>
 		</form>
 		<img v-for="( path, idx ) in imgPaths" :key="idx" :src="path" width="100px">
 	</div>
@@ -15,7 +17,6 @@
 
 <script>
 import axios from 'axios'
-const STATUS_INITIAL = 0, STATUS_SAVING = 1, STATUS_SUCCESS = 2, STATUS_FAILED = 3
 
 export default {
 	name: 'Private',
@@ -40,8 +41,12 @@ export default {
 			console.log( fileList )
 			let formData = new FormData()
 			formData.append( fieldName, fileList[ 0 ], fileList[ 0 ].name )
+			// todo startLoadingAnimation
 			axios.post( 'http://localhost:8001/upload/photo', formData, { requireAuth: true } )
-				.then( res => console.log( res ) )
+				.then( res => {
+					// todo endLoadinAnimation
+					this.loadUserImages()
+				} )
 				.catch( err => console.log( err ) )
 		},
 		loadUserImages() {
@@ -56,4 +61,17 @@ export default {
 </script>
 
 <style lang="sass">
+	.dropbox
+		outline: 2px dashed grey
+		color: red
+		height: 160px
+		width: 100px
+		position: relative
+	.inputFile
+		opacity: 0.5
+		cursor: pointer
+		background: blue
+		width: 100%
+		height: 100%
+		position: absolute
 </style>
