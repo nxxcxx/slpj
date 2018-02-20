@@ -26,18 +26,13 @@ router.route( '/upload/image' )
 			path: req.file.path,
 			originalName: req.file.originalName
 		}
-		// Image.create( imgMeta, function ( err ) {
-		// 	if ( err ) return res.status( 500 ).send( err )
-		// 	return res.status( 200 ).send( req.file )
-		// } )
 		Image.findOneAndUpdate( { userId: req.userId, idx: req.query.idx },
-		{ $set: { path: imgMeta.path, originalName: imgMeta.originalName } },
-		{ upsert: true },
-		function ( err, oldImg ) {
-			if ( err ) return res.status( 500 ).send( err )
-			del( oldImg.path ) // delete old img in the uploads folder
-			console.log( oldImg )
-			return res.status( 200 ).send( oldImg )
+			{ $set: { path: imgMeta.path, originalName: imgMeta.originalName } },
+			{ upsert: true },
+			function ( err, oldImg ) {
+				if ( err ) return res.status( 500 ).send( err )
+				if ( oldImg ) del( oldImg.path ) // delete old img in the uploads folder
+				return res.status( 200 ).send( oldImg )
 		} )
 	} )
 
