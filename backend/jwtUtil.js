@@ -22,6 +22,19 @@ function verify( req, res, next ) {
 	} )
 }
 
+// function authMiddleware( req, res, next ) {
+// 	if ( !req.headers.authorization )
+// 		return res.status( 401 ).send( 'not signed in.' )
+// 	var authHeader = req.headers.authorization.split( ' ' )
+// 	var scheme = authHeader[ 0 ]
+// 	var token = authHeader[ 1 ]
+// 	if ( !token || scheme !== 'Bearer' )
+// 		return res.status( 401 ).send( 'invalid token.' )
+// 	jwt.verify( token, PRIVATE_KEY, function ( err, payload ) {
+// 		next( err, payload )
+// 	} )
+// }
+
 module.exports = {
 	sign,
 	verify

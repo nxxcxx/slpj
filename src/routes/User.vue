@@ -1,8 +1,6 @@
 <template>
-	<div id="Users">
-		<div v-for="( user, idx ) in users" :key="idx">
-			<router-link :to="`user/${user._id}`">{{ user }}</router-link>
-		</div>
+	<div id="User">
+		USER:<pre>{{ user }}</pre>
 	</div>
 </template>
 
@@ -10,23 +8,21 @@
 import axios from 'axios'
 
 export default {
-
-	name: 'Users',
+	name: 'User',
 	data() {
 		return {
-			users: []
+			user: {}
 		}
 	},
 	beforeCreate() {
-		axios.get( 'http://localhost:8001/users' )
+		axios.get( `http://localhost:8001/user/${this.$route.params.id}` )
 			.then( res => {
-				this.users = res.data
+				this.user = res.data
 			} )
 			.catch( err => {
 				console.log( err )
 			} )
 	}
-
 }
 </script>
 

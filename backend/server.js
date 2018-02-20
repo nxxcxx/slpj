@@ -6,6 +6,7 @@ const bodyParser = require( 'body-parser' )
 const cors = require( 'cors' )
 const moment = require( 'moment' )
 const chalk = require( 'chalk' )
+const multer = require( 'multer' )
 
 mongoose.connect( 'mongodb://localhost/slpj' )
 const db = mongoose.connection
@@ -28,6 +29,7 @@ app.use( function ( req, res, next ) {
 
 app.use( require( './routes/auth.route.js' ) )
 app.use( require( './routes/user.route.js' ) )
+app.use( require( './routes/upload.route.js' ) )
 
 const server = app.listen( 8001, function () {
 	console.log( chalk.cyan( 'Listening on port:', server.address().port, getDate() ) )

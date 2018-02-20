@@ -4,6 +4,7 @@ import Home from './Home.vue'
 import Users from './Users.vue'
 import Signin from './Signin.vue'
 import Private from './Private.vue'
+import User from './User.vue'
 
 import auth from '../auth.js'
 
@@ -18,7 +19,8 @@ const router = new VueRouter( {
 		{ path: '/signout', beforeEnter: function ( to, from, next ) {
 			auth.deauthenticate()
 			next( '/signin' )
-		} }
+		} },
+		{ path: '/user/:id', component: User }
 	]
 } )
 
