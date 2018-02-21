@@ -3,7 +3,7 @@ import VueRouter from 'vue-router'
 import Home from './Home.vue'
 import Users from './Users.vue'
 import Signin from './Signin.vue'
-import Private from './Private.vue'
+import Profile from './Profile.vue'
 import User from './User.vue'
 
 import auth from '../auth.js'
@@ -15,7 +15,7 @@ const router = new VueRouter( {
 		{ path: '/', component: Home },
 		{ path: '/users', component: Users },
 		{ path: '/signin', component: Signin },
-		{ path: '/private', component: Private, meta: { requireAuth: true } },
+		{ path: '/profile', component: Profile, meta: { requireAuth: true } },
 		{ path: '/signout', beforeEnter: function ( to, from, next ) {
 			auth.deauthenticate()
 			next( '/signin' )

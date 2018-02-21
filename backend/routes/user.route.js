@@ -13,7 +13,7 @@ router.route( '/users' )
 		} );
 	} )
 
-router.route( '/private' )
+router.route( '/profile' )
 	.get( function ( req, res ) {
 		jwtUtil.verify( req, res, function ( err, payload ) {
 			if ( err ) return res.status( 401 ).send( err )

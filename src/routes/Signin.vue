@@ -29,7 +29,7 @@ export default {
 		signin() {
 			auth.signin( this.user )
 				.then( () => {
-					this.$router.push( '/private' )
+					this.$router.push( '/profile' )
 				} )
 				.catch( () => {
 					this.errmsg = 'login failed.'

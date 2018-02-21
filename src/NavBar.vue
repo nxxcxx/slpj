@@ -5,7 +5,7 @@
 				<router-link to="/">HOME</router-link>
 				<router-link to="/users">USERS</router-link>
 				<router-link to="/signin" v-if="!isAuthenticated" >SINGIN</router-link>
-				<router-link to="/private" v-if="isAuthenticated" >PRIVATE</router-link>
+				<router-link to="/profile" v-if="isAuthenticated" >PROFILE</router-link>
 				<router-link to="/signout" v-if="isAuthenticated" >SIGNOUT</router-link>
 			</li>
 		</ul>
