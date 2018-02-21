@@ -52,4 +52,10 @@ router.route( '/user/:id/images' )
 		} )
 	} )
 
+router.route( '/test' )
+	.post( upload.array(), function ( req, res ) {
+		console.log( req )
+		return res.status( 200 )
+	} )
+
 module.exports = router

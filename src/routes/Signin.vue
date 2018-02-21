@@ -1,12 +1,32 @@
 <template>
-	<div id="Signin">
-		SIGNIN
-		<form>
-			<input v-model="user.email" placeholder="Email">
-			<input v-model="user.password" placeholder="Password" type="password">
-			<button v-on:click="signin" type="submit">SIGN IN</button>
-		</form>
-		{{ errmsg }}
+	<div id="Signin" class="container">
+
+		<div class="section">
+
+			<div class="row">
+				<form>
+					<div class="input-field col s12">
+						<i class="material-icons prefix">person</i>
+						<label for="email">Email</label>
+						<input v-model="user.email" type="text">
+					</div>
+					<div class="input-field col s12">
+						<i class="material-icons prefix">lock</i>
+						<label for ="password">Password</label>
+						<input v-model="user.password" type="password">
+					</div>
+					<div class="center-align">
+						<button v-on:click="signin" type="submit"
+							class="btn waves-effect waves-light">
+							SIGNIN
+						</button>
+					</div>
+				</form>
+				{{ errmsg }}
+			</div>
+
+		</div>
+
 	</div>
 </template>
 

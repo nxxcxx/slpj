@@ -1,14 +1,16 @@
 <template>
 	<div id="navBar">
-		<ul>
-			<li>
-				<router-link to="/">HOME</router-link>
-				<router-link to="/users">USERS</router-link>
-				<router-link to="/signin" v-if="!isAuthenticated" >SINGIN</router-link>
-				<router-link to="/profile" v-if="isAuthenticated" >PROFILE</router-link>
-				<router-link to="/signout" v-if="isAuthenticated" >SIGNOUT</router-link>
-			</li>
-		</ul>
+		<nav>
+			<div class="nav-wrapper">
+				<ul>
+						<li><router-link to="/"><i class="material-icons">home</i></router-link></li>
+						<li><router-link to="/users"><i class="material-icons">people</i></router-link></li>
+						<li class="right"><router-link to="/signin" v-if="!isAuthenticated" ><i class="material-icons">account_circle</i></router-link></li>
+						<li><router-link to="/profile" v-if="isAuthenticated" ><i class="material-icons">person</i></router-link></li>
+						<li class="right"><router-link to="/signout" v-if="isAuthenticated" ><i class="material-icons">exit_to_app</i></router-link></li>
+				</ul>
+			</div>
+		</nav>
 	</div>
 </template>
 
@@ -27,5 +29,5 @@ export default {
 
 <style lang="sass">
 #navBar
-	background: #c9c9c9
+	background: #e9e9e9
 </style>

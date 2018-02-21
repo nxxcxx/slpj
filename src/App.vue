@@ -24,15 +24,12 @@ export default {
 body
 	margin: 0px
 ul
-	list-style-type: none
 	margin: 0px
 	padding: 0px
 li
-	display: inline-block
-	margin: 0 10px
-a
-	color: #002b6b
+	margin: 0px
+
 #app
 	font-family: monospace
-	background: #e6e6e6
+	background: #f9f9f9
 </style>

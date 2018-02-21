@@ -1,22 +1,38 @@
 <template>
 	<div id="Profile">
-		<h3>PROFILE</h3>
-		<pre>{{ user }}</pre>
-		<h3>UPLOAP IMAGES</h3>
-		<div class="imageContainer">
-			<form enctype="multipart/form-data" novalidate>
-				<div class="dropbox" v-for="( n, idx ) in 2" :key="idx"
-					:style="{ 'background-image': `url( ${getBgImgPath( idx )} )` }"
-				>
-					<input class="inputFile"
-						type="file" name="img" accept="image/*"
-						@change="onImageChosen( $event.target.name, $event.target.files, { idx } )"
-					>
-				</div>
-			</form>
-		</div>
+		<div class="container">
 
-		<img v-for="( path, idx ) in imgPaths" :key="idx" :src="path" height="100px">
+			<h5>PROFILE</h5>
+			<pre>{{ user }}</pre>
+
+			<div class="input-field col s12">
+				<i class="material-icons prefix">message</i>
+				<label for="text">LINE</label>
+				<input type="text" v-model="profile.line">
+			</div>
+
+			<h5>UPLOAD IMAGES</h5>
+			<div class="imageContainer">
+				<form enctype="multipart/form-data" novalidate>
+					<div class="dropbox z-depth-3" v-for="( n, idx ) in 2" :key="idx"
+						:style="{ 'background-image': `url( ${getBgImgPath( idx )} )` }"
+					>
+						<input class="inputFile"
+							type="file" name="img" accept="image/*"
+							@change="onImageChosen( $event.target.name, $event.target.files, { idx } )"
+						>
+					</div>
+				</form>
+			</div>
+
+			<div class="section center-align">
+				<button v-on:click="save" type="submit"
+					class="btn waves-effect waves-light">
+					SAVE
+				</button>
+			</div>
+
+		</div>
 	</div>
 </template>
 
@@ -28,7 +44,10 @@ export default {
 	data() {
 		return {
 			user: {},
-			imgPaths: []
+			imgPaths: [],
+			profile: {
+				line: ''
+			}
 		}
 	},
 	computed: {},
@@ -43,6 +62,17 @@ export default {
 		} )
 	},
 	methods: {
+		save() {
+			let formData = new FormData()
+			formData.append( 'line', this.profile.line )
+			console.log( formData )
+			axios.request( {
+				url: 'http://localhost:8001/test',
+				method: 'post',
+				data: formData,
+				requireAuth: true,
+			} )
+		},
 		onImageChosen( fieldName, fileList, meta ) {
 			let formData = new FormData()
 			formData.append( fieldName, fileList[ 0 ], fileList[ 0 ].name )
@@ -60,7 +90,7 @@ export default {
 		loadUserImages() {
 			axios.get( `http://localhost:8001/user/${this.user._id}/images` )
 				.then( res => {
-					this.imgPaths = res.data.map( meta => meta.path )
+					this.imgPaths = res.data.sort( ( a, b ) => a.idx - b.idx ).map( meta => meta.path )
 				} )
 				.catch( err => console.log( err ) )
 		},
@@ -74,19 +104,18 @@ export default {
 </script>
 
 <style lang="sass">
-	.imageContainer
-		background: #b9b9b9
-		width: 200px
-		height: 100px
-		position: relative
-		padding: 10px
 	::-webkit-file-upload-button
 		cursor: pointer
+	.imageContainer
+		border: 1px solid grey
+		width: 100%
+		height: 103px
+		position: relative
 	.dropbox
-		background-size: contain
+		background-position: center
+		background-size: auto 100%
 		background-repeat: no-repeat
 		box-sizing: border-box
-		outline: 2px dashed black
 		height: 100px
 		width: 80px
 		position: relative
