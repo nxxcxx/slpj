@@ -27,6 +27,7 @@ function authenticate( force ) {
 			def.resolve( true )
 		} )
 		.catch( err => {
+			deauthenticate()
 			def.reject( err )
 		} )
 	}
@@ -45,11 +46,10 @@ function signin( userCredentials ) {
 	.then( res => {
 		setToken( res.data.token )
 		store.commit( 'setUser', { user: res.data.user._id } )
-		console.log( res.data )
 		deferred.resolve( true )
 	} )
 	.catch( err => {
-		console.log( err )
+		console.error( err )
 		deauthenticate()
 		deferred.reject( err )
 	} )

@@ -12,12 +12,23 @@
 			</div>
 
 			<h5>UPLOAD IMAGES</h5>
-
 			<div class="imageContainer">
-
 				<form enctype="multipart/form-data" novalidate>
 					<div class="dropbox z-depth-3" v-for="( n, idx ) in 2" :key="idx"
 						:style="{ 'background-image': `url( ${getBgImgPath( idx )} )` }"
+					>
+						<input class="inputFile"
+							type="file" name="img" accept="image/*"
+							@change="onImageChosen( $event.target.name, $event.target.files, { idx } )"
+						>
+
+					</div>
+				</form>
+			</div>
+
+			<div class="imageContainer">
+				<form enctype="multipart/form-data" novalidate>
+					<div class="dropbox z-depth-3" v-for="( n, idx ) in 2" :key="idx"
 					>
 						<input class="inputFile"
 							type="file" name="img" accept="image/*"
@@ -25,7 +36,6 @@
 						>
 					</div>
 				</form>
-
 			</div>
 
 			<div class="section center-align">
@@ -52,8 +62,7 @@ export default {
 			profile: {
 				line: ''
 			},
-			uploads: new Array( 2 ),
-			uploadsPreview: new Array( 2 )
+			uploads: new Array( 2 )
 		}
 	},
 	computed: {},
@@ -61,47 +70,56 @@ export default {
 		axios.get( 'http://localhost:8001/profile', { requireAuth: true } )
 		.then( res => {
 			this.user = res.data
+			this.loadUserImages()
 		} )
 		.catch( err => {
 			auth.deauthenticate()
 			this.$router.push( '/signin' )
-			console.error( err )
+			console.log( err )
 		} )
 	},
 	methods: {
 		save() {
 			let formData = new FormData()
 			formData.append( 'line', this.profile.line )
-			for ( let file of this.uploads ) {
-				formData.append( 'img', file, file.name )
-			}
+			formData.append( 'img', this.uploads )
 			axios.request( {
-				url: 'http://localhost:8001/save',
+				url: 'http://localhost:8001/test',
 				method: 'post',
 				data: formData,
 				requireAuth: true,
-			} ).then( res => {
-				console.log( res )
-			} ).catch( err => {
-				console.error( err )
 			} )
 		},
 		onFileChange( evt, idx ) {
-			let file = evt.target.files[ 0 ]
-			if ( !file ) return
-			this.$set( this.uploads, idx, file )
-			this.createPreviewImage( file, idx )
+			let files = evt.target.files
+			if ( !files.length ) return
+			this.uploads[ idx ] = files[ 0 ]
 		},
-		createPreviewImage( file, idx ) {
-			let img = new Image()
-			let reader = new FileReader()
-			reader.onload = ( e ) => {
-				this.$set( this.uploadsPreview, idx, e.target.result )
-			}
-			reader.readAsDataURL( file )
+		onImageChosen( fieldName, fileList, meta ) {
+			let formData = new FormData()
+			formData.append( fieldName, fileList[ 0 ], fileList[ 0 ].name )
+			axios.request( {
+				url: 'http://localhost:8001/upload/image',
+				method: 'post',
+				data: formData,
+				requireAuth: true,
+				params: { idx: meta.idx }
+			} ).then( res => {
+				// todo endLoadinAnimation
+				this.loadUserImages()
+			} ).catch( err => console.log( err ) )
+		},
+		loadUserImages() {
+			axios.get( `http://localhost:8001/user/${this.user._id}/images` )
+				.then( res => {
+					this.imgPaths = res.data.sort( ( a, b ) => a.idx - b.idx ).map( meta => meta.path )
+				} )
+				.catch( err => console.log( err ) )
 		},
 		getBgImgPath( idx ) {
-			return this.uploadsPreview[ idx ]
+			if ( this.imgPaths[ idx ] )
+				return this.imgPaths[ idx ].replace( '\\', '/' )
+			return ''
 		}
 	}
 }

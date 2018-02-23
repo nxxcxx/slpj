@@ -7,9 +7,7 @@ const jwtUtil = require( '../jwtUtil.js' )
 const multer = require( 'multer' )
 const del = require( 'del' )
 
-let upload = multer( {
-	dest: './uploads/',
-} )
+const upload = multer( { dest: './uploads/' } )
 
 router.route( '/upload/image' )
 	.post( upload.single( 'img' ),
@@ -52,9 +50,16 @@ router.route( '/user/:id/images' )
 		} )
 	} )
 
-router.route( '/test' )
-	.post( upload.array(), function ( req, res ) {
+router.route( '/save' )
+	.post( function ( req, res, next ) {
+			jwtUtil.verify( req, res, function ( err, payload ) {
+				req.userId = payload.userId
+				next()
+			} )
+	}, upload.array( 'img' ), function ( req, res, next ) {
 		console.log( req )
+		// req.files is array of `photos` files
+		// req.body will contain the text fields, if there were any
 		return res.status( 200 )
 	} )
 
