@@ -8,7 +8,7 @@
 			<div class="input-field col s12">
 				<i class="material-icons prefix">message</i>
 				<label for="text">LINE</label>
-				<input type="text" v-model="profile.line">
+				<input type="text" v-model="profile.lineId">
 			</div>
 
 			<h5>UPLOAD IMAGES</h5>
@@ -50,10 +50,11 @@ export default {
 			user: {},
 			imgPaths: [],
 			profile: {
-				line: ''
+				lineId: ''
 			},
 			uploads: new Array( 2 ),
-			uploadsPreview: new Array( 2 )
+			uploadsPreview: new Array( 2 ),
+			uploadSlot: {}
 		}
 	},
 	computed: {},
@@ -71,15 +72,17 @@ export default {
 	methods: {
 		save() {
 			let formData = new FormData()
-			formData.append( 'line', this.profile.line )
-			for ( let file of this.uploads ) {
-				formData.append( 'img', file, file.name )
+			formData.append( 'line', this.profile.lineId )
+			formData.append( 'uploadSlot', JSON.stringify( this.uploadSlot ) )
+			for ( let [ idx, file ] of this.uploads.entries() ) {
+				formData.append( 'img', file )
 			}
 			axios.request( {
 				url: 'http://localhost:8001/save',
 				method: 'post',
 				data: formData,
 				requireAuth: true,
+				params: { uploadSlot: this.uploadSlot }
 			} ).then( res => {
 				console.log( res )
 			} ).catch( err => {
@@ -91,6 +94,7 @@ export default {
 			if ( !file ) return
 			this.$set( this.uploads, idx, file )
 			this.createPreviewImage( file, idx )
+			this.uploadSlot[ file.name ] = idx
 		},
 		createPreviewImage( file, idx ) {
 			let img = new Image()

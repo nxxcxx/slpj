@@ -6,6 +6,7 @@ const Image = require( '../models/image.js' )
 const jwtUtil = require( '../jwtUtil.js' )
 const multer = require( 'multer' )
 const del = require( 'del' )
+const util = require( 'util' )
 
 const upload = multer( { dest: './uploads/' } )
 
