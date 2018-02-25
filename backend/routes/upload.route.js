@@ -58,10 +58,20 @@ router.route( '/save' )
 				next()
 			} )
 	}, upload.array( 'img' ), function ( req, res, next ) {
-		console.log( req )
-		// req.files is array of `photos` files
-		// req.body will contain the text fields, if there were any
-		return res.status( 200 )
+		let uploadSlot = JSON.parse( req.body.uploadSlot )
+		for ( let [ idx, imgName ] of uploadSlot.entries() ) {
+			let file = req.files.find( file => file.originalname === imgName )
+			Image.findOneAndUpdate( { userId: req.userId, idx },
+				{ $set: { path: file.path, originalName: file.originalName } },
+				{ upsert: true }, function ( err, oldImg ) {
+					if ( err ) return res.status( 500 ).send( err )
+					if ( oldImg ) del( oldImg.path )
+				} )
+		}
+		next()
+	}, function ( req, res, next ) {
+		console.log( req.body.line )
+		return res.status( 200 ).send()
 	} )
 
 module.exports = router

@@ -54,7 +54,7 @@ export default {
 			},
 			uploads: new Array( 2 ),
 			uploadsPreview: new Array( 2 ),
-			uploadSlot: {}
+			uploadSlot: []
 		}
 	},
 	computed: {},
@@ -82,7 +82,6 @@ export default {
 				method: 'post',
 				data: formData,
 				requireAuth: true,
-				params: { uploadSlot: this.uploadSlot }
 			} ).then( res => {
 				console.log( res )
 			} ).catch( err => {
@@ -94,7 +93,7 @@ export default {
 			if ( !file ) return
 			this.$set( this.uploads, idx, file )
 			this.createPreviewImage( file, idx )
-			this.uploadSlot[ file.name ] = idx
+			this.uploadSlot[ idx ] = file.name
 		},
 		createPreviewImage( file, idx ) {
 			let img = new Image()

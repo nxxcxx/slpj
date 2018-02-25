@@ -4,7 +4,8 @@ var Schema = mongoose.Schema
 
 var userSchema = new Schema( {
 	email: String,
-	password: String
+	password: String,
+	line: String,
 } )
 
 userSchema.pre( 'save', function ( next ) {
