@@ -3,9 +3,9 @@ var mongoose = require( 'mongoose' )
 var Schema = mongoose.Schema
 
 var userSchema = new Schema( {
-	email: String,
-	password: String,
-	line: String,
+	email: { type: String, required: true },
+	password: { type: String, required: true },
+	line: { type: String, default: '-' },
 } )
 
 userSchema.pre( 'save', function ( next ) {

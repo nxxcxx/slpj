@@ -7,16 +7,16 @@
 
 			<div class="input-field col s12">
 				<i class="material-icons prefix">message</i>
-				<label for="text">LINE</label>
-				<input type="text" v-model="profile.lineId">
+				<label for="text" :class="{ active: !!profile.line }" >LINE</label>
+				<input type="text" v-model="profile.line">
 			</div>
 
 			<h5>UPLOAD IMAGES</h5>
 
-			<div class="imageContainer">
 
-				<form enctype="multipart/form-data" novalidate>
-					<div class="dropbox z-depth-3" v-for="( n, idx ) in 2" :key="idx"
+			<form enctype="multipart/form-data" novalidate>
+				<div class="imageContainer z-depth-1">
+					<div class="dropbox z-depth-1" v-for="( n, idx ) in 6" :key="idx"
 						:style="{ 'background-image': `url( ${getBgImgPath( idx )} )` }"
 					>
 						<input class="inputFile"
@@ -24,9 +24,9 @@
 							@change="onFileChange( $event, idx )"
 						>
 					</div>
-				</form>
+				</div>
+			</form>
 
-			</div>
 
 			<div class="section center-align">
 				<button v-on:click="save" type="submit"
@@ -50,7 +50,7 @@ export default {
 			user: {},
 			imgPaths: [],
 			profile: {
-				lineId: ''
+				line: ''
 			},
 			uploads: new Array( 2 ),
 			uploadsPreview: new Array( 2 ),
@@ -62,6 +62,8 @@ export default {
 		axios.get( 'http://localhost:8001/profile', { requireAuth: true } )
 		.then( res => {
 			this.user = res.data
+			this.loadUserProfile()
+			this.loadUserImages()
 		} )
 		.catch( err => {
 			auth.deauthenticate()
@@ -72,7 +74,7 @@ export default {
 	methods: {
 		save() {
 			let formData = new FormData()
-			formData.append( 'line', this.profile.lineId )
+			formData.append( 'line', this.profile.line )
 			formData.append( 'uploadSlot', JSON.stringify( this.uploadSlot ) )
 			for ( let [ idx, file ] of this.uploads.entries() ) {
 				formData.append( 'img', file )
@@ -104,7 +106,22 @@ export default {
 			reader.readAsDataURL( file )
 		},
 		getBgImgPath( idx ) {
-			return this.uploadsPreview[ idx ]
+			return this.uploadsPreview[ idx ] ? this.uploadsPreview[ idx ] : this.imgPaths[ idx ]
+		},
+		loadUserImages() {
+			axios.get( `http://localhost:8001/user/${this.user._id}/images` )
+				.then( res => {
+					for ( let uri of res.data ) {
+						this.$set( this.imgPaths, uri.idx, uri.path.replace( '\\', '/' ) )
+					}
+				} )
+				.catch( err => console.log( err ) )
+		},
+		loadUserProfile() {
+			if ( this.user.line )
+				this.profile.line = this.user.line
+		},
+		updated() {
 		}
 	}
 }
@@ -114,22 +131,20 @@ export default {
 	::-webkit-file-upload-button
 		cursor: pointer
 	.imageContainer
-		border: 1px solid grey
-		width: 100%
-		height: 103px
 		position: relative
+		overflow: hidden
+		display: flex
+		justify-content: center
+		height: 120px
 	.dropbox
 		background-position: center
 		background-size: auto 100%
 		background-repeat: no-repeat
 		box-sizing: border-box
-		height: 100px
-		width: 80px
+		flex-basis: 100%
 		position: relative
-		float: left
-
 	.inputFile
-		opacity: 0.2
+		opacity: 0
 		cursor: pointer
 		background: blue
 		width: 100%

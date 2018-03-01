@@ -5,7 +5,7 @@ var LocalStrategy = require( 'passport-local' ).Strategy
 
 var registerStrategy = new LocalStrategy( {
 	usernameField: 'email',
-	passwordField: 'password'
+	passwordField: 'password',
 }, function ( email, password, done ) {
 	User.findOne( { email }, function( err, user ) {
 		if ( err ) return done( err )

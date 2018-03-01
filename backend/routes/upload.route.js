@@ -3,6 +3,7 @@
 const chalk = require( 'chalk' )
 const router = require( 'express' ).Router()
 const Image = require( '../models/image.js' )
+const User = require( '../models/user.js' )
 const jwtUtil = require( '../jwtUtil.js' )
 const multer = require( 'multer' )
 const del = require( 'del' )
@@ -45,7 +46,7 @@ router.route( '/image/:id' )
 
 router.route( '/user/:id/images' )
 	.get( function ( req, res ) {
-		Image.find( { userId: req.params.id }, function ( err, imgs ) {
+		Image.find( { userId: req.params.id }, null, { sort: { idx: 1 } }, function ( err, imgs ) {
 			if ( err ) return res.status( 500 ).send( err )
 			return res.status( 200 ).send( imgs )
 		} )
@@ -61,6 +62,7 @@ router.route( '/save' )
 		let uploadSlot = JSON.parse( req.body.uploadSlot )
 		for ( let [ idx, imgName ] of uploadSlot.entries() ) {
 			let file = req.files.find( file => file.originalname === imgName )
+			if ( !file ) continue
 			Image.findOneAndUpdate( { userId: req.userId, idx },
 				{ $set: { path: file.path, originalName: file.originalName } },
 				{ upsert: true }, function ( err, oldImg ) {
@@ -71,7 +73,11 @@ router.route( '/save' )
 		next()
 	}, function ( req, res, next ) {
 		console.log( req.body.line )
-		return res.status( 200 ).send()
+		User.findOneAndUpdate( { _id: req.userId },
+			{ $set: { line: req.body.line } }, function ( err, user ) {
+			if ( err ) return res.status( 500 ).send( err )
+			return res.status( 200 ).send()
+		} )
 	} )
 
 module.exports = router
