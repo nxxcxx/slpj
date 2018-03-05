@@ -8,8 +8,33 @@ const jwtUtil = require( '../jwtUtil.js' )
 const multer = require( 'multer' )
 const del = require( 'del' )
 const util = require( 'util' )
+const path = require( 'path' )
+const crypto = require( 'crypto' )
+const mime = require( 'mime' )
 
-const upload = multer( { dest: './uploads/' } )
+const storage = multer.diskStorage( {
+	destination: function ( req, res, cb ) {
+		cb( null, './uploads/')
+	},
+	filename: function ( req, file, cb ) {
+		crypto.pseudoRandomBytes( 16, function ( err, raw ) {
+			cb( null, raw.toString( 'hex' ) + Date.now() + '.' + mime.extension( file.mimetype ) )
+		} )
+	}
+} )
+
+const upload = multer( {
+	storage,
+	fileFilter: function ( req, file, cb ) {
+		let filetypes = /jpeg|jpg/
+		let mimetype = filetypes.test( file.mimetype )
+		let extname = filetypes.test( path.extname( file.originalname ).toLowerCase() )
+		if ( mimetype && extname )
+			return cb( null, true )
+		cb( 'Error: File upload only supports the following filetypes - ' + filetypes )
+	},
+
+} )
 
 router.route( '/upload/image' )
 	.post( upload.single( 'img' ),
@@ -31,7 +56,7 @@ router.route( '/upload/image' )
 			{ upsert: true },
 			function ( err, oldImg ) {
 				if ( err ) return res.status( 500 ).send( err )
-				if ( oldImg ) del( oldImg.path ) // delete old img in the uploads folder
+				if ( oldImg ) del( oldImg.path )
 				return res.status( 200 ).send( oldImg )
 		} )
 	} )
@@ -46,37 +71,49 @@ router.route( '/image/:id' )
 
 router.route( '/user/:id/images' )
 	.get( function ( req, res ) {
-		Image.find( { userId: req.params.id }, null, { sort: { idx: 1 } }, function ( err, imgs ) {
-			if ( err ) return res.status( 500 ).send( err )
-			return res.status( 200 ).send( imgs )
+		Image.find( { userId: req.params.id }, null, { sort: { idx: 1 } },
+			function ( err, imgs ) {
+				if ( err ) return res.status( 500 ).send( err )
+				return res.status( 200 ).send( imgs )
 		} )
 	} )
 
 router.route( '/save' )
-	.post( function ( req, res, next ) {
+	.post( function verifyToken( req, res, next ) {
 			jwtUtil.verify( req, res, function ( err, payload ) {
 				req.userId = payload.userId
 				next()
 			} )
-	}, upload.array( 'img' ), function ( req, res, next ) {
+	}, upload.array( 'img' ), function handleUploads( req, res, next ) {
 		let uploadSlot = JSON.parse( req.body.uploadSlot )
 		for ( let [ idx, imgName ] of uploadSlot.entries() ) {
 			let file = req.files.find( file => file.originalname === imgName )
 			if ( !file ) continue
 			Image.findOneAndUpdate( { userId: req.userId, idx },
-				{ $set: { path: file.path, originalName: file.originalName } },
-				{ upsert: true }, function ( err, oldImg ) {
+				{ $set: { path: file.path, originalName: file.originalname } }, { upsert: true },
+				function ( err, oldImg ) {
 					if ( err ) return res.status( 500 ).send( err )
 					if ( oldImg ) del( oldImg.path )
 				} )
 		}
 		next()
-	}, function ( req, res, next ) {
+	}, function handleDeletes( req, res, next ) {
+		let delIdx = JSON.parse( req.body.deletes )
+		for ( let [ idx, remove ] of delIdx.entries() ) {
+			if ( remove ) {
+				Image.findOneAndRemove( { userId: req.userId, idx }, function ( err, img ) {
+					if ( err ) return res.status( 500 ).send( err )
+					if ( img ) del( img.path )
+				} )
+			}
+		}
+		next()
+	}, function handleInfo( req, res, next ) {
 		console.log( req.body.line )
-		User.findOneAndUpdate( { _id: req.userId },
-			{ $set: { line: req.body.line } }, function ( err, user ) {
-			if ( err ) return res.status( 500 ).send( err )
-			return res.status( 200 ).send()
+		User.findOneAndUpdate( { _id: req.userId }, { $set: { line: req.body.line } },
+			function ( err, user ) {
+				if ( err ) return res.status( 500 ).send( err )
+				return res.status( 200 ).send()
 		} )
 	} )
 

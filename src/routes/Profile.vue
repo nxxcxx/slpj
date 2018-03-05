@@ -1,40 +1,50 @@
 <template>
 	<div id="Profile">
 		<div class="container">
-
+		<div class="row">
 			<h5>PROFILE</h5>
 			<pre>{{ user }}</pre>
 
-			<div class="input-field col s12">
+			<div class="input-field col s6">
 				<i class="material-icons prefix">message</i>
 				<label for="text" :class="{ active: !!profile.line }" >LINE</label>
 				<input type="text" v-model="profile.line">
 			</div>
 
+			<div class="col s12">
 			<h5>UPLOAD IMAGES</h5>
-
-
 			<form enctype="multipart/form-data" novalidate>
 				<div class="imageContainer z-depth-1">
 					<div class="dropbox z-depth-1" v-for="( n, idx ) in 6" :key="idx"
 						:style="{ 'background-image': `url( ${getBgImgPath( idx )} )` }"
+						@mouseover="onMouseOver( $event )" @mouseleave="onMouseLeave( $event )"
 					>
+
+						<i class="material-icons trashicon"
+							v-show="!!getBgImgPath( idx )"
+							@click="markImgForDeletion( idx )"
+						>close</i>
+
 						<input class="inputFile"
 							type="file" name="img" accept="image/*"
 							@change="onFileChange( $event, idx )"
 						>
+
 					</div>
 				</div>
 			</form>
-
-
-			<div class="section center-align">
-				<button v-on:click="save" type="submit"
-					class="btn waves-effect waves-light">
-					SAVE
-				</button>
 			</div>
 
+			<div class="col s12">
+				<div class="section center-align">
+					<button v-on:click="save" type="submit"
+						class="btn waves-effect waves-light">
+						SAVE
+					</button>
+				</div>
+			</div>
+
+		</div>
 		</div>
 	</div>
 </template>
@@ -52,9 +62,10 @@ export default {
 			profile: {
 				line: ''
 			},
-			uploads: new Array( 2 ),
-			uploadsPreview: new Array( 2 ),
-			uploadSlot: []
+			uploads: [],
+			uploadsPreview: [],
+			uploadSlot: [],
+			deletes: []
 		}
 	},
 	computed: {},
@@ -76,6 +87,7 @@ export default {
 			let formData = new FormData()
 			formData.append( 'line', this.profile.line )
 			formData.append( 'uploadSlot', JSON.stringify( this.uploadSlot ) )
+			formData.append( 'deletes', JSON.stringify( this.deletes ) )
 			for ( let [ idx, file ] of this.uploads.entries() ) {
 				formData.append( 'img', file )
 			}
@@ -93,9 +105,12 @@ export default {
 		onFileChange( evt, idx ) {
 			let file = evt.target.files[ 0 ]
 			if ( !file ) return
+			let duplicated = this.uploads.find( f => f ? f.name === file.name : false )
+			if ( duplicated ) return
 			this.$set( this.uploads, idx, file )
 			this.createPreviewImage( file, idx )
 			this.uploadSlot[ idx ] = file.name
+			this.deletes[ idx ] = false
 		},
 		createPreviewImage( file, idx ) {
 			let img = new Image()
@@ -121,7 +136,22 @@ export default {
 			if ( this.user.line )
 				this.profile.line = this.user.line
 		},
-		updated() {
+		onMouseOver( evt ) {
+			evt.target.parentElement.classList.add( 'z-depth-5' )
+			evt.target.parentElement.classList.add( 'onhover' )
+		},
+		onMouseLeave( evt ) {
+			evt.target.classList.remove( 'z-depth-5' )
+			evt.target.classList.remove( 'onhover' )
+		},
+		markImgForDeletion( idx ) {
+			if ( this.uploadsPreview[ idx ] ) {
+				this.$set( this.uploadsPreview, idx, null )
+			}
+			this.$set( this.uploads, idx, null )
+			this.$set( this.imgPaths, idx, null )
+			this.uploadSlot[ idx ] = null
+			this.deletes[ idx ] = true
 		}
 	}
 }
@@ -135,14 +165,18 @@ export default {
 		overflow: hidden
 		display: flex
 		justify-content: center
-		height: 120px
+		flex-wrap: wrap
 	.dropbox
 		background-position: center
 		background-size: auto 100%
 		background-repeat: no-repeat
 		box-sizing: border-box
-		flex-basis: 100%
+		height: 180px
+		min-width: 80px
+		max-width: 200px
+		width: calc( 100% * ( 1/3 ) - 10px - 1px )
 		position: relative
+		flex-grow: 1
 	.inputFile
 		opacity: 0
 		cursor: pointer
@@ -150,4 +184,12 @@ export default {
 		width: 100%
 		height: 100%
 		position: absolute
+	.onhover
+		z-index: 10
+	.trashicon
+		position: absolute
+		right: 0px
+		cursor: pointer
+		user-select: none
+		z-index: 100
 </style>
