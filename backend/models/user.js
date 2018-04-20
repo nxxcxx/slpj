@@ -6,6 +6,7 @@ var userSchema = new Schema( {
 	email: { type: String, required: true },
 	password: { type: String, required: true },
 	line: { type: String, default: '' },
+	comments: [ { type: Schema.Types.ObjectId, ref: 'comment' } ]
 } )
 
 userSchema.pre( 'save', function ( next ) {

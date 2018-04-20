@@ -2,6 +2,7 @@
 	<div id="Users">
 		<div v-for="( user, idx ) in users" :key="idx">
 			<router-link :to="`user/${user._id}`"> {{ user }} </router-link>
+			<br>
 			<img v-for="( path, idx ) in getUserImagePaths( user._id )" :key="idx" :src="path" width="40px">
 		</div>
 	</div>
@@ -19,7 +20,7 @@ export default {
 			userImagePaths: {}
 		}
 	},
-	mounted() {
+	beforeCreate() {
 		axios.get( 'http://localhost:8001/users' )
 			.then( res => {
 				this.users = res.data
@@ -29,7 +30,6 @@ export default {
 	},
 	methods: {
 		getUserImagePaths( userId ) {
-			console.log( this.userImagePaths[ userId ] )
 			return this.userImagePaths[ userId ]
 		},
 		loadUserImages( users ) {

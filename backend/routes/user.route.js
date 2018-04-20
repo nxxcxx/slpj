@@ -20,7 +20,6 @@ router.route( '/profile' )
 			User.findOne( { _id: payload.userId }, function ( err, user ) {
 				if ( err ) return res.status( 500 ).send( err )
 				if ( user ) return res.status( 200 ).send( user )
-				res.status( 200 ).send()
 			} )
 		} )
 	} )
@@ -30,7 +29,6 @@ router.route( '/user/:id' )
 		User.findOne( { _id: req.params.id }, function ( err, user ) {
 			if ( err ) return res.status( 500 ).send( err )
 			if ( user ) return res.status( 200 ).send( user )
-			res.status( 200 ).send()
 		} )
 	} )
 

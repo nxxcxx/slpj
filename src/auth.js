@@ -5,8 +5,7 @@ import store from './store.js'
 axios.interceptors.request.use( function ( config ) {
 	if ( config.requireAuth ) {
 		let token = localStorage.getItem( 'JWT' )
-		if ( token )
-			config.headers.Authorization = `Bearer ${token}`
+		if ( token ) config.headers.Authorization = `Bearer ${token}`
 	}
 	return config
 }, function ( err ) {
@@ -36,7 +35,7 @@ function authenticate( force ) {
 }
 
 function deauthenticate() {
-	localStorage.removeItem( 'JWT' )
+	resetToken()
 	store.dispatch( 'resetUser' )
 }
 
@@ -58,6 +57,10 @@ function signin( userCredentials ) {
 
 function isAuthenticated() {
 	return store.state.user !== null
+}
+
+function resetToken() {
+	localStorage.removeItem( 'JWT' )
 }
 
 function setToken( token ) {

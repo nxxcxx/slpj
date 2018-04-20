@@ -20,7 +20,13 @@
 							class="btn waves-effect waves-light">
 							SIGNIN
 						</button>
+						<router-link to="/register">
+							<button class="btn waves-effect waves-light deep-orange">
+								REGISTER
+							</button>
+						</router-link>
 					</div>
+
 				</form>
 				{{ errmsg }}
 			</div>

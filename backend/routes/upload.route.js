@@ -11,10 +11,11 @@ const util = require( 'util' )
 const path = require( 'path' )
 const crypto = require( 'crypto' )
 const mime = require( 'mime' )
+const Comment = require( '../models/comment.js' )
 
 const storage = multer.diskStorage( {
 	destination: function ( req, res, cb ) {
-		cb( null, './uploads/')
+		cb( null, './uploads' )
 	},
 	filename: function ( req, file, cb ) {
 		crypto.pseudoRandomBytes( 16, function ( err, raw ) {
@@ -35,6 +36,36 @@ const upload = multer( {
 	},
 
 } )
+
+function verifyIdentity( req, res, next ) {
+	jwtUtil.verify( req, res, function ( err, payload ) {
+		req.userId = payload.userId
+		next()
+	} )
+}
+
+router.route( '/user/:id/comments' )
+	.get( function ( req, res ) {
+		User.findById( req.params.id, function ( err, user ) {
+			if ( err ) return res.status( 500 ).send( err )
+			User.populate( user, [ { path: 'comments' } ], function ( err, populatedUser ) {
+				if ( err ) return res.status( 500 ).send( err )
+				return res.status( 200 ).send( populatedUser )
+			} )
+		} )
+	} )
+
+router.route( '/upload/comment' )
+	.post( verifyIdentity, function createComment( req, res ) {
+		Comment.create( { byUserId: req.userId, text: req.body.text }, function ( err, comment ) {
+			if ( err ) return res.status( 500 ).send( err )
+			User.findOneAndUpdate( { _id: req.body.toUserId }, { $push: { 'comments': comment._id } },
+				function ( err, user ) {
+					if ( err ) return res.status( 500 ).send( err )
+					return res.status( 200 ).send( comment )
+			} )
+		} )
+	} )
 
 router.route( '/upload/image' )
 	.post( upload.single( 'img' ),
@@ -79,12 +110,7 @@ router.route( '/user/:id/images' )
 	} )
 
 router.route( '/save' )
-	.post( function verifyToken( req, res, next ) {
-			jwtUtil.verify( req, res, function ( err, payload ) {
-				req.userId = payload.userId
-				next()
-			} )
-	}, upload.array( 'img' ), function handleUploads( req, res, next ) {
+	.post( verifyIdentity, upload.array( 'img' ), function handleUploads( req, res, next ) {
 		let uploadSlot = JSON.parse( req.body.uploadSlot )
 		for ( let [ idx, imgName ] of uploadSlot.entries() ) {
 			let file = req.files.find( file => file.originalname === imgName )

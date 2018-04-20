@@ -5,6 +5,8 @@ import Users from './Users.vue'
 import Signin from './Signin.vue'
 import Profile from './Profile.vue'
 import User from './User.vue'
+import Register from './Register.vue'
+import Forum from './Forum.vue'
 
 import auth from '../auth.js'
 
@@ -14,13 +16,15 @@ const router = new VueRouter( {
 	routes: [
 		{ path: '/', component: Home },
 		{ path: '/users', component: Users },
+		{ path: '/forum', component: Forum },
 		{ path: '/signin', component: Signin },
 		{ path: '/profile', component: Profile, meta: { requireAuth: true } },
 		{ path: '/signout', beforeEnter: function ( to, from, next ) {
 			auth.deauthenticate()
 			next( '/signin' )
 		} },
-		{ path: '/user/:id', component: User }
+		{ path: '/user/:id', component: User },
+		{ path: '/register', component: Register }
 	]
 } )
 

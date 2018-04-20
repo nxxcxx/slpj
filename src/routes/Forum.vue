@@ -1,6 +1,6 @@
 <template>
-	<div id="Home">
-		HOME
+	<div id="Forum">
+		FORUM
 	</div>
 </template>
 
@@ -9,7 +9,7 @@ import axios from 'axios'
 import auth from '../auth.js'
 
 export default {
-	name: 'Home'
+	name: 'Forum'
 }
 </script>
 
