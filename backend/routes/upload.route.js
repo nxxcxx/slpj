@@ -44,17 +44,6 @@ function verifyIdentity( req, res, next ) {
 	} )
 }
 
-router.route( '/user/:id/comments' )
-	.get( function ( req, res ) {
-		User.findById( req.params.id, function ( err, user ) {
-			if ( err ) return res.status( 500 ).send( err )
-			User.populate( user, [ { path: 'comments', movel: 'comment' } ], function ( err, populatedUser ) {
-				if ( err ) return res.status( 500 ).send( err )
-				return res.status( 200 ).send( populatedUser )
-			} )
-		} )
-	} )
-
 router.route( '/upload/comment' )
 	.post( verifyIdentity, function createComment( req, res ) {
 		Comment.create( { byUserId: req.userId, text: req.body.text }, function ( err, comment ) {
@@ -100,15 +89,6 @@ router.route( '/image/:id' )
 		} )
 	} )
 
-router.route( '/user/:id/images' )
-	.get( function ( req, res ) {
-		Image.find( { userId: req.params.id }, null, { sort: { idx: 1 } },
-			function ( err, imgs ) {
-				if ( err ) return res.status( 500 ).send( err )
-				return res.status( 200 ).send( imgs )
-		} )
-	} )
-
 router.route( '/save' )
 	.post( verifyIdentity, upload.array( 'img' ),
 	function handleUploads( req, res, next ) {
@@ -116,14 +96,6 @@ router.route( '/save' )
 		for ( let [ idx, imgName ] of uploadSlot.entries() ) {
 			let file = req.files.find( file => file.originalname === imgName )
 			if ( !file ) continue
-			/* find img
-					if img
-						update path
-						delete old img
-					else
-						create
-						update user.images[]
-			*/
 			Image.findOne( { userId: req.userId, idx }, function ( err, img ) {
 				if ( err ) return res.status( 500 ).send( err )
 				if ( img ) {

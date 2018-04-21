@@ -2,8 +2,9 @@
 
 const chalk = require( 'chalk' )
 const router = require( 'express' ).Router()
-const User = require( '../models/user.js' )
 const jwtUtil = require( '../jwtUtil.js' )
+const User = require( '../models/user.js' )
+const Image = require( '../models/image.js' )
 
 router.route( '/users' )
 	.get( function ( req, res ) {
@@ -39,6 +40,26 @@ router.route( '/user/:id' )
 				function ( err, user ) {
 				if ( err ) return res.status( 500 ).send( err )
 				if ( user ) return res.status( 200 ).send( user )
+			} )
+		} )
+	} )
+
+router.route( '/user/:id/images' )
+	.get( function ( req, res ) {
+		Image.find( { userId: req.params.id }, null, { sort: { idx: 1 } },
+			function ( err, imgs ) {
+				if ( err ) return res.status( 500 ).send( err )
+				return res.status( 200 ).send( imgs )
+		} )
+	} )
+
+router.route( '/user/:id/comments' )
+	.get( function ( req, res ) {
+		User.findById( req.params.id, function ( err, user ) {
+			if ( err ) return res.status( 500 ).send( err )
+			User.populate( user, [ { path: 'comments', movel: 'comment' } ], function ( err, populatedUser ) {
+				if ( err ) return res.status( 500 ).send( err )
+				return res.status( 200 ).send( populatedUser )
 			} )
 		} )
 	} )

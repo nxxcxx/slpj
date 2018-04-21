@@ -161,6 +161,7 @@ export default {
 	::-webkit-file-upload-button
 		cursor: pointer
 	.imageContainer
+		max-width: 600px
 		position: relative
 		overflow: visible
 		display: flex
@@ -173,7 +174,7 @@ export default {
 		box-sizing: border-box
 		height: 180px
 		min-width: 80px
-		max-width: 200px
+		max-width: 180px
 		width: calc( 100% * ( 1/3 ) - 10px - 1px )
 		position: relative
 		flex-grow: 1

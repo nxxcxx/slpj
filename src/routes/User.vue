@@ -5,7 +5,7 @@
 
 			<div class="col s12">
 
-				USER<pre>{{ user }}</pre>
+				USER<pre style="max-height: 300px; overflow: scroll;">{{ user }}</pre>
 
 				<img v-for="( img, idx ) in user.images" :key="idx" :src="img.path" width="100px">
 
@@ -70,7 +70,7 @@ export default {
 				text: this.$refs.commentText.value
 			}, { requireAuth: true } )
 			.then( res => {
-				// this.$router.go()
+				this.$router.go()
 			} )
 		},
 	}
