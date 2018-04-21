@@ -26,9 +26,20 @@ router.route( '/profile' )
 
 router.route( '/user/:id' )
 	.get( function ( req, res ) {
-		User.findOne( { _id: req.params.id }, function ( err, user ) {
+		User.findById( req.params.id, function ( err, user ) {
 			if ( err ) return res.status( 500 ).send( err )
-			if ( user ) return res.status( 200 ).send( user )
+			User.populate( user, [
+				{ path: 'comments',populate: {
+						path: 'byUserId', model: 'user', populate: {
+							path: 'images', model: 'image'
+						}
+					}
+				},
+				{ path: 'images' } ],
+				function ( err, user ) {
+				if ( err ) return res.status( 500 ).send( err )
+				if ( user ) return res.status( 200 ).send( user )
+			} )
 		} )
 	} )
 

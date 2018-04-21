@@ -48,7 +48,7 @@ router.route( '/user/:id/comments' )
 	.get( function ( req, res ) {
 		User.findById( req.params.id, function ( err, user ) {
 			if ( err ) return res.status( 500 ).send( err )
-			User.populate( user, [ { path: 'comments' } ], function ( err, populatedUser ) {
+			User.populate( user, [ { path: 'comments', movel: 'comment' } ], function ( err, populatedUser ) {
 				if ( err ) return res.status( 500 ).send( err )
 				return res.status( 200 ).send( populatedUser )
 			} )

@@ -14,7 +14,7 @@
 			<div class="col s12">
 			<h5>UPLOAD IMAGES</h5>
 			<form enctype="multipart/form-data" novalidate>
-				<div class="imageContainer z-depth-1">
+				<div class="imageContainer">
 					<div class="dropbox z-depth-1" v-for="( n, idx ) in 6" :key="idx"
 						:style="{ 'background-image': `url( ${getBgImgPath( idx )} )` }"
 						@mouseover="onMouseOver( $event )" @mouseleave="onMouseLeave( $event )"
@@ -162,7 +162,7 @@ export default {
 		cursor: pointer
 	.imageContainer
 		position: relative
-		overflow: hidden
+		overflow: visible
 		display: flex
 		justify-content: center
 		flex-wrap: wrap
