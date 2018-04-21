@@ -110,17 +110,39 @@ router.route( '/user/:id/images' )
 	} )
 
 router.route( '/save' )
-	.post( verifyIdentity, upload.array( 'img' ), function handleUploads( req, res, next ) {
+	.post( verifyIdentity, upload.array( 'img' ),
+	function handleUploads( req, res, next ) {
 		let uploadSlot = JSON.parse( req.body.uploadSlot )
 		for ( let [ idx, imgName ] of uploadSlot.entries() ) {
 			let file = req.files.find( file => file.originalname === imgName )
 			if ( !file ) continue
-			Image.findOneAndUpdate( { userId: req.userId, idx },
-				{ $set: { path: file.path, originalName: file.originalname } }, { upsert: true },
-				function ( err, oldImg ) {
-					if ( err ) return res.status( 500 ).send( err )
-					if ( oldImg ) del( oldImg.path )
-				} )
+			/* find img
+					if img
+						update path
+						delete old img
+					else
+						create
+						update user.images[]
+			*/
+			Image.findOne( { userId: req.userId, idx }, function ( err, img ) {
+				if ( err ) return res.status( 500 ).send( err )
+				if ( img ) {
+					del( img.path )
+					Image.update( { userId: req.userId, idx },
+					{ path: file.path, originalName: file.originalname },
+					function ( err ) {
+						if ( err ) return res.status( 500 ).send( err )
+					} )
+				} else {
+					Image.create( { userId: req.userId, idx, path: file.path, originalName: file.originalname },
+						function ( err, newImg ) {
+						if ( err ) return res.status( 500 ).send( err )
+						User.findByIdAndUpdate( req.userId, { $push: { images: newImg._id } }, function ( err, user ) {
+							if ( err ) return res.status( 500 ).send( err )
+						} )
+					} )
+				}
+			} )
 		}
 		next()
 	}, function handleDeletes( req, res, next ) {
@@ -129,14 +151,21 @@ router.route( '/save' )
 			if ( remove ) {
 				Image.findOneAndRemove( { userId: req.userId, idx }, function ( err, img ) {
 					if ( err ) return res.status( 500 ).send( err )
-					if ( img ) del( img.path )
+					if ( img ) {
+						del( img.path )
+						User.findOneAndUpdate( { _id: req.userId }, { $pull: { images: img._id } },
+							function ( err, user ) {
+								if ( err ) return res.status( 500 ).send( err )
+							}
+						)
+					}
 				} )
 			}
 		}
 		next()
 	}, function handleInfo( req, res, next ) {
 		console.log( req.body.line )
-		User.findOneAndUpdate( { _id: req.userId }, { $set: { line: req.body.line } },
+		User.findByIdAndUpdate( req.userId, { $set: { line: req.body.line } },
 			function ( err, user ) {
 				if ( err ) return res.status( 500 ).send( err )
 				return res.status( 200 ).send()

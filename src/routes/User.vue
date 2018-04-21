@@ -22,7 +22,15 @@
 				</form>
 
 				COMMENTS
-				<pre>{{ comments }}</pre>
+				<ul class="collection">
+					<li class="collection-item avatar" v-for="( comment, idx ) in comments" :key="idx">
+						<i v-if="!comment.avatarImgPath" class="material-icons circle">account_circle</i>
+						<img v-if="comment.avatarImgPath" :src="comment.avatarImgPath" class="circle">
+						<span class="title">[{{ comment.byUserId }}] {{ comment.time }}</span>
+						<p>{{ comment.text }}</p>
+					</li>
+				</ul>
+
 
 			</div>
 
@@ -65,6 +73,19 @@ export default {
 			axios.get( `http://localhost:8001/user/${this.$route.params.id}/comments`)
 				.then( res => {
 					this.comments = res.data.comments
+
+
+					this.comments.map( cm => {
+						axios.get( `http://localhost:8001/user/${cm.byUserId}/images` )
+							.then( res => {
+								// todo cleanup
+								console.log( res.data )
+								this.$set( cm, 'avatarImgPath', res.data[ 0 ] ? res.data[ 0 ].path : null )
+							} )
+					} )
+					console.log( this.comments )
+
+
 				} )
 		},
 		postComment() {
@@ -83,4 +104,8 @@ export default {
 </script>
 
 <style lang="sass">
+	p
+		white-space: pre-line
+	pre
+		margin: 0px
 </style>
