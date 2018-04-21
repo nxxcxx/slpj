@@ -33,7 +33,7 @@ router.route( '/user/:id' )
 				{ path: 'comments',populate: {
 						path: 'byUserId', model: 'user', populate: {
 							path: 'images', model: 'image'
-						}
+						}, select: 'email images'
 					}
 				},
 				{ path: 'images' } ],

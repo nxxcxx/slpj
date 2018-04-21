@@ -41,6 +41,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
 	name: 'Register',
 	data() {
@@ -53,7 +55,12 @@ export default {
 	},
 	methods: {
 		register() {
-
+			axios.post( 'http://localhost:8001/signup', this.user )
+			.then( res => {
+				console.log( res )
+				this.$router.push( '/signin' )
+			} )
+			.catch( err => console.error( err.response ) )
 		}
 	},
 	mounted() {

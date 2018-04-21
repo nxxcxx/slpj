@@ -26,7 +26,7 @@
 					<li class="collection-item avatar" v-for="( comment, idx ) in user.comments" :key="idx">
 						<i v-if="!getCommentAvatarImagePath( comment )" class="material-icons circle">account_circle</i>
 						<img v-if="getCommentAvatarImagePath( comment )" :src="getCommentAvatarImagePath( comment )" class="circle">
-						<span class="title">[{{ comment.byUserId._id }}] {{ comment.time }}</span>
+						<span class="title">[{{ comment.byUserId.email }}] {{ comment.time | relativeTime }}</span>
 						<p>{{ comment.text }}</p>
 					</li>
 				</ul>
@@ -41,6 +41,7 @@
 
 <script>
 import axios from 'axios'
+import moment from 'moment'
 
 export default {
 	name: 'User',
