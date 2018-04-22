@@ -2,18 +2,18 @@
 	<div id="Signin" class="container">
 
 		<div class="section">
-
+			<br>
 			<div class="row">
 				<form>
 					<div class="input-field col s12">
 						<i class="material-icons prefix">person</i>
+						<input id="email" v-model="user.email" type="text">
 						<label for="email">Email</label>
-						<input v-model="user.email" type="text">
 					</div>
 					<div class="input-field col s12">
 						<i class="material-icons prefix">lock</i>
-						<label for ="password">Password</label>
-						<input v-model="user.password" type="password">
+						<input id="password" v-model="user.password" type="password">
+						<label for="password">Password</label>
 					</div>
 					<div class="center-align">
 						<button v-on:click="signin" type="submit"

@@ -2,19 +2,19 @@
 	<div id="Register" class="container">
 
 			<form>
-
+				<br>
 				<div class="row">
 
 					<div class="input-field col s12">
 						<i class="material-icons prefix">person</i>
+						<input id="email" v-model="user.email" type="text">
 						<label for="email">Email</label>
-						<input v-model="user.email" type="text">
 					</div>
 
 					<div class="input-field col s12">
 						<i class="material-icons prefix">lock</i>
+						<input id="password" v-model="user.password" type="password">
 						<label for ="password">Password</label>
-						<input v-model="user.password" type="password">
 					</div>
 
 				</div>

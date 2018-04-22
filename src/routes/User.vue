@@ -5,32 +5,49 @@
 
 			<div class="col s12">
 
-				USER<pre style="max-height: 300px; overflow: scroll;">{{ user }}</pre>
+				<h5>USER</h5>
 
 				<img v-for="( img, idx ) in user.images" :key="idx" :src="img.path" width="100px">
 
-				<form>
-					<div class="input-field">
-						<i class="material-icons prefix">comment</i>
-						<textarea class="materialize-textarea" ref="commentText"></textarea>
-						<label>Enter a comment</label>
+				<ul ref="collapsible" class="collapsible">
+					<li>
+						<div class="collapsible-header">
+							<span>User info</span>
+						</div>
+						<div class="collapsible-body">
+							<pre style="max-height: 300px; overflow-y: scroll;">{{ user }}</pre>
+						</div>
+					</li>
+				</ul>
+
+				<br>
+
+				<div>
+					<form v-if="isAuthenticated()">
+						<div class="input-field">
+							<i class="material-icons prefix">comment</i>
+							<textarea id="comment" class="materialize-textarea" ref="commentText"></textarea>
+							<label for="comment">Enter a comment</label>
+						</div>
 						<button v-on:click="postComment"
 							class="btn waves-effect waves-light right">
 							POST
 						</button>
-					</div>
-				</form>
+					</form>
+				</div>
 
-				COMMENTS
+				<br>
+
+				<h5>COMMENTS</h5>
 				<ul class="collection">
 					<li class="collection-item avatar" v-for="( comment, idx ) in user.comments" :key="idx">
 						<i v-if="!getCommentAvatarImagePath( comment )" class="material-icons circle">account_circle</i>
 						<img v-if="getCommentAvatarImagePath( comment )" :src="getCommentAvatarImagePath( comment )" class="circle">
-						<span class="title">[{{ comment.byUserId.email }}] {{ comment.time | relativeTime }}</span>
+						<span class="title"><b> {{ comment.byUserId.email }} </b></span>
+						<span style="float: right;"> {{ comment.time | relativeTime }} </span>
 						<p>{{ comment.text }}</p>
 					</li>
 				</ul>
-
 
 			</div>
 
@@ -42,6 +59,7 @@
 <script>
 import axios from 'axios'
 import moment from 'moment'
+import auth from '../auth.js'
 
 export default {
 	name: 'User',
@@ -51,9 +69,13 @@ export default {
 		}
 	},
 	mounted() {
+		M.Collapsible.init( this.$refs.collapsible )
 		this.loadUser()
 	},
 	methods: {
+		isAuthenticated() {
+			return auth.isAuthenticated()
+		},
 		getCommentAvatarImagePath( comment ) {
 			if ( comment ) return comment.byUserId.images[ 0 ] ? comment.byUserId.images[ 0 ].path : null
 			return null

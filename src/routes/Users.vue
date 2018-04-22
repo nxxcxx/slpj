@@ -1,10 +1,21 @@
 <template>
 	<div id="Users">
-		<div v-for="( user, idx ) in users" :key="idx">
+		<!-- <div v-for="( user, idx ) in users" :key="idx">
 			<router-link :to="`user/${user._id}`"> {{ user }} </router-link>
 			<br>
 			<img v-for="( path, idx ) in getUserImagePaths( user._id )" :key="idx" :src="path" width="40px">
-		</div>
+		</div> -->
+		<ul class="collection">
+
+				<li class="collection-item avatar" v-for="( user, idx ) in users" :key="idx">
+					<router-link :to="`user/${user._id}`">
+						<i class="material-icons circle">account_circle</i>
+						<img v-if="getUserImagePaths( user._id )" class="circle" :src="getUserImagePaths( user._id )[ 0 ]">
+						<span class="title"> {{ user.email }} </span>
+					</router-link>
+				</li>
+
+		</ul>
 	</div>
 </template>
 
@@ -30,6 +41,7 @@ export default {
 	},
 	methods: {
 		getUserImagePaths( userId ) {
+			console.log( this.userImagePaths[ userId ] )
 			return this.userImagePaths[ userId ]
 		},
 		loadUserImages( users ) {
@@ -47,4 +59,6 @@ export default {
 </script>
 
 <style lang="sass">
+	.collection-item
+		min-height: 60px !important
 </style>
