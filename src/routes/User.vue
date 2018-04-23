@@ -5,6 +5,10 @@
 
 			<div class="col s12">
 
+			<div v-if="loading" class="progress">
+				<div class="indeterminate"></div>
+			</div>
+
 				<h5>USER</h5>
 
 				<img v-for="( img, idx ) in user.images" :key="idx" :src="img.path" width="100px">
@@ -66,6 +70,7 @@ export default {
 	data() {
 		return {
 			user: {},
+			loading: true
 		}
 	},
 	mounted() {
@@ -85,6 +90,7 @@ export default {
 				.then( res => {
 					console.log( res.data )
 					this.user = res.data
+					this.loading = false
 				} )
 		},
 		postComment() {

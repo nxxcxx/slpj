@@ -7,11 +7,35 @@ const User = require( '../models/user.js' )
 const Image = require( '../models/image.js' )
 
 router.route( '/users' )
-	.get( function ( req, res ) {
-		User.find( {}, function ( err, users ) {
+	.get( function queryUsers( req, res, next ) {
+		User.find( {}, null, {
+			skip: parseInt( req.query.skip ) || 0,
+			limit: parseInt( req.query.limit )
+		}, function ( err, users ) {
 			if ( err ) return res.status( 500 ).send( err )
-			res.status( 200 ).send( users );
-		} );
+			User.populate( users, [ { path: 'images' } ], function ( err, users ) {
+				if ( err ) return res.status( 500 ).send( err )
+				// return res.status( 200 ).send( users )
+				req._users = users
+				next()
+			} )
+		} )
+	}, function queryTotalUsers( req, res ) {
+		User.count( {}, function ( err, count ) {
+			if ( err ) return res.status( 500 ).send( err )
+			return res.status( 200 ).send( {
+				total: count,
+				users: req._users
+			} )
+		} )
+	} )
+
+router.route( '/users/total' )
+	.get( function ( req, res ) {
+		User.count( {}, function ( err, count ) {
+			if ( err ) return res.status( 500 ).send( err )
+			return res.status( 200 ).send( { total: count } )
+		} )
 	} )
 
 router.route( '/profile' )

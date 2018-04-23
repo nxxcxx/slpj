@@ -26,6 +26,7 @@ function authenticate( force ) {
 			def.resolve( true )
 		} )
 		.catch( err => {
+			// console.log( err.response )
 			deauthenticate()
 			def.reject( err )
 		} )

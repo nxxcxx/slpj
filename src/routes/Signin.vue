@@ -51,6 +51,10 @@ export default {
 			errmsg: ''
 		}
 	},
+	created() {
+		if ( auth.isAuthenticated() )
+			this.$router.push( '/profile' )
+	},
 	methods: {
 		signin() {
 			auth.signin( this.user )
