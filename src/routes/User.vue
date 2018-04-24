@@ -9,7 +9,7 @@
 				<div class="indeterminate"></div>
 			</div>
 
-				<h5>USER</h5>
+				<h5>USER: {{ user.email }}</h5>
 
 				<img v-for="( img, idx ) in user.images" :key="idx" :src="img.path" width="100px">
 
