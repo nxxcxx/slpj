@@ -22,6 +22,7 @@ export default {
 
 <style lang="sass">
 body
+	background: #fafafa
 	margin: 0px
 ul
 	margin: 0px
@@ -31,5 +32,4 @@ li
 
 #app
 	font-family: monospace
-	background: #f9f9f9
 </style>

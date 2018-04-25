@@ -1,5 +1,6 @@
 <template>
-	<div id="Users">
+	<div id="Users" class="container">
+		<h5>USERS</h5>
 		<ul id="inf-scroll" class="collection">
 			<li class="collection-item avatar" v-for="( user, idx ) in users" :key="idx">
 				<router-link :to="`user/${user._id}`">
@@ -9,10 +10,10 @@
 				</router-link>
 			</li>
 		</ul>
-		<div class="center-align">
-			<button v-on:click="loadNextPage"
+		<div class="center-align" v-if="this.users.length !== this.totalUsers">
+			<button v-on:click="loadNextPage" style="width: 100%;"
 				class="btn waves-effect waves-light">
-				LOAD MORE
+				<i class="material-icons large">expand_more</i>
 			</button>
 		</div>
 	</div>
@@ -27,7 +28,7 @@ export default {
 	name: 'Users',
 	data() {
 		return {
-			limitItemPerPage: 4
+			limitItemPerPage: 10
 		}
 	},
 	computed: {

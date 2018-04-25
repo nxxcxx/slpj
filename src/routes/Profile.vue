@@ -3,7 +3,11 @@
 		<div class="container">
 		<div class="row">
 			<h5>PROFILE</h5>
-			<pre>{{ user }}</pre>
+
+			<div class="row">
+				<i class="material-icons circle" style="font-size: 12rem">account_circle</i>
+			</div>
+			<pre>{{ user._id }}</pre>
 
 			<div class="input-field col s6">
 				<i class="material-icons prefix">message</i>

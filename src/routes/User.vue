@@ -9,8 +9,7 @@
 				<div class="indeterminate"></div>
 			</div>
 
-				<h5>USER: {{ user.email }}</h5>
-
+				<h5>{{ user.email }}</h5>>
 				<img v-for="( img, idx ) in user.images" :key="idx" :src="img.path" width="100px">
 
 				<ul ref="collapsible" class="collapsible">
@@ -21,6 +20,19 @@
 						<div class="collapsible-body">
 							<pre style="max-height: 300px; overflow-y: scroll;">{{ user }}</pre>
 						</div>
+					</li>
+				</ul>
+
+				<br>
+
+				<h5>COMMENTS</h5>
+				<ul class="collection">
+					<li class="collection-item avatar" v-for="( comment, idx ) in user.comments" :key="idx">
+						<i v-if="!getCommentAvatarImagePath( comment )" class="material-icons circle">account_circle</i>
+						<img v-if="getCommentAvatarImagePath( comment )" :src="getCommentAvatarImagePath( comment )" class="circle">
+						<span class="title"><b> {{ comment.byUserId.email }} </b></span>
+						<span style="float: right;"> {{ comment.time | relativeTime }} </span>
+						<p>{{ comment.text }}</p>
 					</li>
 				</ul>
 
@@ -39,19 +51,6 @@
 						</button>
 					</form>
 				</div>
-
-				<br>
-
-				<h5>COMMENTS</h5>
-				<ul class="collection">
-					<li class="collection-item avatar" v-for="( comment, idx ) in user.comments" :key="idx">
-						<i v-if="!getCommentAvatarImagePath( comment )" class="material-icons circle">account_circle</i>
-						<img v-if="getCommentAvatarImagePath( comment )" :src="getCommentAvatarImagePath( comment )" class="circle">
-						<span class="title"><b> {{ comment.byUserId.email }} </b></span>
-						<span style="float: right;"> {{ comment.time | relativeTime }} </span>
-						<p>{{ comment.text }}</p>
-					</li>
-				</ul>
 
 			</div>
 
