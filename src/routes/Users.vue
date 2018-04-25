@@ -9,6 +9,12 @@
 				</router-link>
 			</li>
 		</ul>
+		<div class="center-align">
+			<button v-on:click="loadNextPage"
+				class="btn waves-effect waves-light">
+				LOAD MORE
+			</button>
+		</div>
 	</div>
 </template>
 
@@ -21,31 +27,39 @@ export default {
 	name: 'Users',
 	data() {
 		return {
-			totalUsers: Infinity,
-			users: [],
-			currentPage: 1,
-			limitItemPerPage: 15,
-			pagesNumbers: Array.from( { length: 20 }, ( v, k ) => k + 1 )
+			limitItemPerPage: 4
 		}
 	},
+	computed: {
+		users() { return this.$store.state.users },
+		totalUsers() { return this.$store.state.totalUsers },
+		currentPage() { return this.$store.state.currentPage }
+	},
 	mounted() {
-		let infScroll = new InfiniteScroll( '#inf-scroll', {
+		this.infScroll = new InfiniteScroll( '#inf-scroll', {
 			path: this.getPath,
 			append: false,
 			responseType: 'json',
 			history: false
 		} )
-		infScroll.loadNextPage()
-		infScroll.on( 'load', ( res ) => {
-			console.log( this.currentPage )
+		this.infScroll.on( 'load', ( res ) => {
 			if ( res === null ) return
-			this.currentPage += 1
-			this.totalUsers = res.total
-			this.users = [ ...this.users, ...res.users ]
+			this.$store.commit( 'incrementPage' )
+			this.$store.commit( 'setTotalUsers', { totalUsers: res.total } )
+			this.$store.commit( 'appendUsers', { users: res.users } )
 		} )
+		if ( this.currentPage === 1 )
+			this.infScroll.loadNextPage()
+	},
+	destroyed() {
+		this.infScroll.destroy()
 	},
 	methods: {
+		loadNextPage() {
+			this.infScroll.loadNextPage()
+		},
 		getPath() {
+			// todo update totalUsers here
 			if ( this.users.length === this.totalUsers ) return
 			return `http://localhost:8001/users?limit=${this.limitItemPerPage}&skip=${(this.currentPage - 1)*this.limitItemPerPage}`
 		},

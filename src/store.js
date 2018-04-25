@@ -4,7 +4,10 @@ Vue.use( Vuex )
 
 export default new Vuex.Store( {
 	state: {
-		user: null
+		user: null,
+		users: [],
+		totalUsers: Infinity,
+		currentPage: 1
 	},
 	mutations: {
 		setUser( state, payload ) {
@@ -12,6 +15,15 @@ export default new Vuex.Store( {
 		},
 		resetUser( state ) {
 			state.user = null
+		},
+		appendUsers( state, payload ) {
+			state.users = [ ...state.users, ...payload.users  ]
+		},
+		incrementPage( state ) {
+			state.currentPage += 1
+		},
+		setTotalUsers( state, payload ) {
+			state.totalUsers = payload.totalUsers
 		}
 	},
 	actions: {
