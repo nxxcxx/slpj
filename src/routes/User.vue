@@ -90,11 +90,6 @@ export default {
 		}
 	},
 	methods: {
-		goToUser( id ) {
-			console.log( id )
-			this.$router.push( `/user/${id}` )
-			this.$router.go()
-		},
 		isAuthenticated() {
 			return auth.isAuthenticated()
 		},
