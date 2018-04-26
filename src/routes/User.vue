@@ -9,7 +9,7 @@
 				<div class="indeterminate"></div>
 			</div>
 
-				<h5>{{ user.email }}</h5>>
+				<h5>{{ user.email }}</h5>
 				<img v-for="( img, idx ) in user.images" :key="idx" :src="img.path" width="100px">
 
 				<ul ref="collapsible" class="collapsible">
@@ -28,9 +28,14 @@
 				<h5>COMMENTS</h5>
 				<ul class="collection">
 					<li class="collection-item avatar" v-for="( comment, idx ) in user.comments" :key="idx">
-						<i v-if="!getCommentAvatarImagePath( comment )" class="material-icons circle">account_circle</i>
-						<img v-if="getCommentAvatarImagePath( comment )" :src="getCommentAvatarImagePath( comment )" class="circle">
-						<span class="title"><b> {{ comment.byUserId.email }} </b></span>
+						<router-link :to="`${comment.byUserId._id}`">
+							<i v-if="!getCommentAvatarImagePath( comment )" class="material-icons circle">account_circle</i>
+							<img v-if="getCommentAvatarImagePath( comment )" :src="getCommentAvatarImagePath( comment )" class="circle">
+						</router-link>
+
+						<router-link :to="`${comment.byUserId._id}`">
+							<span class="title"><b> {{ comment.byUserId.email }} </b></span>
+						</router-link>
 						<span style="float: right;"> {{ comment.time | relativeTime }} </span>
 						<p>{{ comment.text }}</p>
 					</li>
@@ -40,10 +45,12 @@
 
 				<div>
 					<form v-if="isAuthenticated()">
-						<div class="input-field">
-							<i class="material-icons prefix">comment</i>
-							<textarea id="comment" class="materialize-textarea" ref="commentText"></textarea>
-							<label for="comment">Enter a comment</label>
+						<div class="row">
+							<div class="input-field col s12">
+								<i class="material-icons prefix">comment</i>
+								<textarea id="comment" class="materialize-textarea" ref="commentText"></textarea>
+								<label for="comment">Enter a comment</label>
+							</div>
 						</div>
 						<button v-on:click="postComment"
 							class="btn waves-effect waves-light right">
@@ -76,7 +83,18 @@ export default {
 		M.Collapsible.init( this.$refs.collapsible )
 		this.loadUser()
 	},
+	watch: {
+		// vue router reuse the same component, need to load new data when param changed
+		'$route.params.id'( newId, oldId ) {
+			this.loadUser()
+		}
+	},
 	methods: {
+		goToUser( id ) {
+			console.log( id )
+			this.$router.push( `/user/${id}` )
+			this.$router.go()
+		},
 		isAuthenticated() {
 			return auth.isAuthenticated()
 		},

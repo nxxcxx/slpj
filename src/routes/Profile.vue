@@ -2,46 +2,116 @@
 	<div id="Profile">
 		<div class="container">
 		<div class="row">
-			<h5>PROFILE</h5>
 
-			<div class="row">
-				<i class="material-icons circle" style="font-size: 12rem">account_circle</i>
-			</div>
-			<pre>{{ user._id }}</pre>
-
-			<div class="input-field col s6">
-				<i class="material-icons prefix">message</i>
-				<label for="text" :class="{ active: !!profile.line }" >LINE</label>
-				<input type="text" v-model="profile.line">
+			<div class="row center-align">
+				<h5>PROFILE</h5>
+				<span>{{ user._id }}</span>
 			</div>
 
-			<div class="col s12">
-			<h5>UPLOAD IMAGES</h5>
-			<form enctype="multipart/form-data" novalidate>
-				<div class="imageContainer">
-					<div class="dropbox z-depth-1" v-for="( n, idx ) in 6" :key="idx"
-						:style="{ 'background-image': `url( ${getBgImgPath( idx )} )` }"
-						@mouseover="onMouseOver( $event )" @mouseleave="onMouseLeave( $event )"
-					>
-
-						<i class="material-icons trashicon"
-							v-show="!!getBgImgPath( idx )"
-							@click="markImgForDeletion( idx )"
-						>close</i>
-
-						<input class="inputFile"
-							type="file" name="img" accept="image/*"
-							@change="onFileChange( $event, idx )"
-						>
-
+			<div class="row center-align">
+				<div class="col s12">
+					<span>Profile status</span>
+					<div class="switch">
+						<label>
+							off
+							<input type="checkbox">
+							<span class="lever"></span>
+							on
+						</label>
 					</div>
 				</div>
-			</form>
 			</div>
 
-			<div class="col s12">
-				<div class="section center-align">
-					<button v-on:click="save" type="submit"
+			<br>
+
+			<div class="row">
+
+				<div class="input-field col s6">
+					<i class="material-icons prefix">message</i>
+					<input id="line" type="text" v-model="profile.line">
+					<label for="line" :class="{ active: !!profile.line }" >LINE</label>
+				</div>
+
+				<div class="input-field col s6">
+					<i class="material-icons prefix">wc</i>
+					<select ref="select">
+						<option value="" disabled selected>Choose</option>
+						<option value="m">Male</option>
+						<option value="f">Female</option>
+					</select>
+					<label>GENDER</label>
+				</div>
+
+				<div class="input-field col s6">
+					<i class="material-icons prefix">event_seat</i>
+					<input id="weight" type="text" v-model="profile.weight">
+					<label for="weight" :class="{ active: !!profile.weight }">WEIGHT</label>
+				</div>
+
+				<div class="input-field col s6">
+					<i class="material-icons prefix">accessibility</i>
+					<input id="height" type="text" v-model="profile.height">
+					<label for="height" :class="{ active: !!profile.height }">HEIGHT</label>
+				</div>
+
+				<div class="input-field col s6">
+					<i class="material-icons prefix">event</i>
+					<input id="age" type="text" v-model="profile.age">
+					<label for="age" :class="{ active: !!profile.age }">AGE</label>
+				</div>
+
+				<div class="input-field col s6">
+					<i class="material-icons prefix">attach_money</i>
+					<input id="cost" type="text" v-model="profile.cost">
+					<label for="cost" :class="{ active: !!profile.cost }">COST</label>
+				</div>
+
+				<div class="input-field col s12">
+					<i class="material-icons prefix">comment</i>
+					<textarea id="details" class="materialize-textarea" ref="detailsText"></textarea>
+					<label for="details">Enter a details</label>
+				</div>
+
+			</div>
+
+			<div class="row">
+				<div class="col s12">
+					<div id="map" ref="map"></div>
+				</div>
+				<div class="col s12">
+					LAT: {{ marker.position.lat() }} LNG: {{ marker.position.lng() }}
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col s12">
+				<h5>UPLOAD IMAGES</h5>
+				<form enctype="multipart/form-data" novalidate>
+					<div class="imageContainer">
+						<div class="dropbox z-depth-1" v-for="( n, idx ) in 6" :key="idx"
+							:style="{ 'background-image': `url( ${getBgImgPath( idx )} )` }"
+							@mouseover="onMouseOver( $event )" @mouseleave="onMouseLeave( $event )"
+						>
+
+							<i class="material-icons trashicon"
+								v-show="!!getBgImgPath( idx )"
+								@click="markImgForDeletion( idx )"
+							>close</i>
+
+							<input class="inputFile"
+								type="file" name="img" accept="image/*"
+								@change="onFileChange( $event, idx )"
+							>
+
+						</div>
+					</div>
+				</form>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col s12">
+					<button v-on:click="save" type="submit" style="width: 100%;"
 						class="btn waves-effect waves-light">
 						SAVE
 					</button>
@@ -64,12 +134,15 @@ export default {
 			user: {},
 			imgPaths: [],
 			profile: {
-				line: ''
+				line: '',
+				weight: '',
+				height: ''
 			},
 			uploads: [],
 			uploadsPreview: [],
 			uploadSlot: [],
-			deletes: []
+			deletes: [],
+			marker: new google.maps.Marker( { position: { lat: 0, lng: 0 } } )
 		}
 	},
 	computed: {},
@@ -85,8 +158,20 @@ export default {
 			this.$router.push( '/signin' )
 			console.error( err )
 		} )
+		this.initMap()
+		M.FormSelect.init( this.$refs.select, {} )
 	},
 	methods: {
+		initMap() {
+			let map = new google.maps.Map( this.$refs.map, {
+				center: { lat: 13.779460, lng: 100.574174 },
+				zoom: 11
+			} )
+			map.addListener( 'click', ( e ) => {
+				this.marker.setMap( map )
+				this.marker.position = e.latLng
+			} )
+		},
 		save() {
 			let formData = new FormData()
 			formData.append( 'line', this.profile.line )
@@ -162,6 +247,8 @@ export default {
 </script>
 
 <style lang="sass">
+	#map
+		height: 300px
 	::-webkit-file-upload-button
 		cursor: pointer
 	.imageContainer

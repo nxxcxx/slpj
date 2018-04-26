@@ -1,20 +1,24 @@
 <template>
-	<div id="Users" class="container">
-		<h5>USERS</h5>
-		<ul id="inf-scroll" class="collection">
-			<li class="collection-item avatar" v-for="( user, idx ) in users" :key="idx">
-				<router-link :to="`user/${user._id}`">
-					<i v-if="!getUserImagePaths( user._id )" class="material-icons circle">account_circle</i>
-					<img v-if="getUserImagePaths( user._id )" class="circle" :src="getUserImagePaths( user._id )">
-					<span class="title"> {{ user.email }} </span>
-				</router-link>
-			</li>
-		</ul>
-		<div class="center-align" v-if="this.users.length !== this.totalUsers">
-			<button v-on:click="loadNextPage" style="width: 100%;"
-				class="btn waves-effect waves-light">
-				<i class="material-icons large">expand_more</i>
-			</button>
+	<div id="Users">
+		<div class="container">
+			<div class="row">
+				<h5>USERS</h5>
+				<ul id="inf-scroll" class="collection">
+					<li class="collection-item avatar" v-for="( user, idx ) in users" :key="idx">
+						<router-link :to="`user/${user._id}`">
+							<i v-if="!getUserImagePaths( user._id )" class="material-icons circle">account_circle</i>
+							<img v-if="getUserImagePaths( user._id )" class="circle" :src="getUserImagePaths( user._id )">
+							<span class="title"> {{ user.email }} </span>
+						</router-link>
+					</li>
+				</ul>
+				<div class="center-align" v-if="this.users.length !== this.totalUsers">
+					<button v-on:click="loadNextPage" style="width: 100%;"
+						class="btn waves-effect waves-light">
+						<i class="material-icons large">expand_more</i>
+					</button>
+				</div>
+			</div>
 		</div>
 	</div>
 </template>
@@ -28,7 +32,7 @@ export default {
 	name: 'Users',
 	data() {
 		return {
-			limitItemPerPage: 10
+			limitItemPerPage: 20
 		}
 	},
 	computed: {

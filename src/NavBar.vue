@@ -3,7 +3,7 @@
 		<nav>
 			<div class="nav-wrapper">
 				<ul>
-						<li><router-link to="/"><i class="material-icons">home</i></router-link></li>
+						<!-- <li><router-link to="/"><i class="material-icons">home</i></router-link></li> -->
 						<li><router-link to="/users"><i class="material-icons">people</i></router-link></li>
 						<!-- <li><router-link to="/forum"><i class="material-icons">forum</i></router-link></li> -->
 						<li><router-link to="/profile" v-if="isAuthenticated" ><i class="material-icons">person</i></router-link></li>
