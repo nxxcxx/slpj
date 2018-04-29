@@ -8,6 +8,7 @@ const Image = require( '../models/image.js' )
 
 router.route( '/users' )
 	.get( function queryUsers( req, res, next ) {
+		console.log( req.query )
 		User.find( {}, null, {
 			skip: parseInt( req.query.skip ) || 0,
 			limit: parseInt( req.query.limit )
@@ -15,7 +16,6 @@ router.route( '/users' )
 			if ( err ) return res.status( 500 ).send( err )
 			User.populate( users, [ { path: 'images' } ], function ( err, users ) {
 				if ( err ) return res.status( 500 ).send( err )
-				// return res.status( 200 ).send( users )
 				req._users = users
 				next()
 			} )

@@ -136,8 +136,19 @@ router.route( '/save' )
 		}
 		next()
 	}, function handleInfo( req, res, next ) {
-		console.log( req.body.line )
-		User.findByIdAndUpdate( req.userId, { $set: { line: req.body.line } },
+		User.findByIdAndUpdate( req.userId, {
+			$set: {
+				active: req.body.active,
+				line: req.body.line,
+				gender: req.body.gender,
+				weight: req.body.weight,
+				height: req.body.height,
+				age: req.body.age,
+				cost: req.body.cost,
+				details: req.body.details,
+				location: JSON.parse( req.body.location )
+			}
+		},
 			function ( err, user ) {
 				if ( err ) return res.status( 500 ).send( err )
 				return res.status( 200 ).send()

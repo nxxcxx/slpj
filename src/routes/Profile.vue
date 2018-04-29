@@ -14,7 +14,7 @@
 					<div class="switch">
 						<label>
 							off
-							<input type="checkbox">
+							<input type="checkbox" v-model="profile.active">
 							<span class="lever"></span>
 							on
 						</label>
@@ -34,10 +34,10 @@
 
 				<div class="input-field col s6">
 					<i class="material-icons prefix">wc</i>
-					<select ref="select">
+					<select ref="select" v-model="profile.gender">
 						<option value="" disabled selected>Choose</option>
-						<option value="m">Male</option>
-						<option value="f">Female</option>
+						<option value="Male">Male</option>
+						<option value="Female">Female</option>
 					</select>
 					<label>GENDER</label>
 				</div>
@@ -67,9 +67,9 @@
 				</div>
 
 				<div class="input-field col s12">
-					<i class="material-icons prefix">comment</i>
-					<textarea id="details" class="materialize-textarea" ref="detailsText"></textarea>
-					<label for="details">Enter a details</label>
+					<i class="material-icons prefix">details</i>
+					<textarea id="details" class="materialize-textarea" ref="detailsText" v-model="profile.details"></textarea>
+					<label for="details" :class="{ active: !!profile.details }" >Enter a details</label>
 				</div>
 
 			</div>
@@ -95,7 +95,7 @@
 
 							<i class="material-icons trashicon"
 								v-show="!!getBgImgPath( idx )"
-								@click="markImgForDeletion( idx )"
+								@click="markImgForDeletion( $event, idx )"
 							>close</i>
 
 							<input class="inputFile"
@@ -134,9 +134,15 @@ export default {
 			user: {},
 			imgPaths: [],
 			profile: {
-				line: '',
-				weight: '',
-				height: ''
+				active: false,
+				line: null,
+				gender: null,
+				weight: null,
+				height: null,
+				age: null,
+				cost: null,
+				details: null,
+				location: { lat: 0, lng: 0 }
 			},
 			uploads: [],
 			uploadsPreview: [],
@@ -145,11 +151,11 @@ export default {
 			marker: new google.maps.Marker( { position: { lat: 0, lng: 0 } } )
 		}
 	},
-	computed: {},
 	mounted() {
 		axios.get( 'http://localhost:8001/profile', { requireAuth: true } )
 		.then( res => {
 			this.user = res.data
+			console.log( this.user )
 			this.loadUserProfile()
 			this.loadUserImages()
 		} )
@@ -163,18 +169,27 @@ export default {
 	},
 	methods: {
 		initMap() {
-			let map = new google.maps.Map( this.$refs.map, {
+			this.map = new google.maps.Map( this.$refs.map, {
 				center: { lat: 13.779460, lng: 100.574174 },
 				zoom: 11
 			} )
-			map.addListener( 'click', ( e ) => {
-				this.marker.setMap( map )
+			this.map.addListener( 'click', ( e ) => {
+				this.marker.setMap( this.map )
 				this.marker.position = e.latLng
+				this.profile.location = { lat: e.latLng.lat(), lng: e.latLng.lng() }
 			} )
 		},
 		save() {
 			let formData = new FormData()
+			formData.append( 'active', this.profile.active )
 			formData.append( 'line', this.profile.line )
+			formData.append( 'gender', this.profile.gender )
+			formData.append( 'weight', this.profile.weight )
+			formData.append( 'height', this.profile.height )
+			formData.append( 'age', this.profile.age )
+			formData.append( 'cost', this.profile.cost )
+			formData.append( 'details', this.profile.details )
+			formData.append( 'location', JSON.stringify( this.profile.location ) )
 			formData.append( 'uploadSlot', JSON.stringify( this.uploadSlot ) )
 			formData.append( 'deletes', JSON.stringify( this.deletes ) )
 			for ( let [ idx, file ] of this.uploads.entries() ) {
@@ -187,8 +202,9 @@ export default {
 				requireAuth: true,
 			} ).then( res => {
 				console.log( res )
+				this.$router.go()
 			} ).catch( err => {
-				console.error( err )
+				console.error( err.response )
 			} )
 		},
 		onFileChange( evt, idx ) {
@@ -196,8 +212,8 @@ export default {
 			if ( !file ) return
 			let duplicated = this.uploads.find( f => f ? f.name === file.name : false )
 			if ( duplicated ) return
-			this.$set( this.uploads, idx, file )
 			this.createPreviewImage( file, idx )
+			this.$set( this.uploads, idx, file )
 			this.uploadSlot[ idx ] = file.name
 			this.deletes[ idx ] = false
 		},
@@ -222,8 +238,34 @@ export default {
 				.catch( err => console.log( err ) )
 		},
 		loadUserProfile() {
-			if ( this.user.line )
-				this.profile.line = this.user.line
+			function updateSelectorValue(selector, value) {
+			 selector.val(value).closest('.select-wrapper').find('li').removeClass("active").closest('.select-wrapper').find('.select-dropdown').val(value).find('span:contains(' + value + ')').parent().addClass('selected active');
+			}
+			this.profile.active = this.user.active
+
+			if ( this.user.location ) {
+				if ( this.user.location.lat !== 0 ) {
+					this.marker.setPosition( this.user.location )
+					this.marker.setMap( this.map )
+					this.map.setCenter( this.marker.getPosition() )
+				}
+			}
+
+			if ( this.user.line ) this.profile.line = this.user.line
+			if ( this.user.gender ) {
+				// TODO
+				this.profile.gender = this.user.gender
+				updateSelectorValue( $( this.$refs.select ), this.user.gender )
+			}
+			if ( this.user.weight ) this.profile.weight = this.user.weight
+			if ( this.user.height ) this.profile.height = this.user.height
+			if ( this.user.age ) this.profile.age = this.user.age
+			if ( this.user.cost ) this.profile.cost = this.user.cost
+			if ( this.user.details ) {
+				this.profile.details = this.user.details
+				// monkey patching
+				setTimeout( () => { M.textareaAutoResize( this.$refs.detailsText ) }, 0 )
+			}
 		},
 		onMouseOver( evt ) {
 			evt.target.parentElement.classList.add( 'z-depth-5' )
@@ -233,7 +275,8 @@ export default {
 			evt.target.classList.remove( 'z-depth-5' )
 			evt.target.classList.remove( 'onhover' )
 		},
-		markImgForDeletion( idx ) {
+		markImgForDeletion( evt, idx ) {
+			$( evt.srcElement ).siblings( 'input' ).val( '' )
 			if ( this.uploadsPreview[ idx ] ) {
 				this.$set( this.uploadsPreview, idx, null )
 			}
@@ -252,7 +295,6 @@ export default {
 	::-webkit-file-upload-button
 		cursor: pointer
 	.imageContainer
-		max-width: 600px
 		position: relative
 		overflow: visible
 		display: flex

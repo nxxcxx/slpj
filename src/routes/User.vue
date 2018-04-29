@@ -100,7 +100,6 @@ export default {
 		loadUser() {
 			axios.get( `http://localhost:8001/user/${this.$route.params.id}` )
 				.then( res => {
-					console.log( res.data )
 					this.user = res.data
 					this.loading = false
 				} )

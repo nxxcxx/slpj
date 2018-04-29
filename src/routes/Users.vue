@@ -30,7 +30,7 @@ export default {
 	name: 'Users',
 	data() {
 		return {
-			limitItemPerPage: 20
+			limitItemPerPage: 10
 		}
 	},
 	computed: {
@@ -45,7 +45,7 @@ export default {
 			responseType: 'json',
 			history: false
 		} )
-		this.infScroll.on( 'load', ( res ) => {
+		this.infScroll.on( 'load', res => {
 			if ( res === null ) return
 			this.$store.commit( 'incrementPage' )
 			this.$store.commit( 'setTotalUsers', { totalUsers: res.total } )
@@ -53,6 +53,9 @@ export default {
 		} )
 		if ( this.currentPage === 1 )
 			this.infScroll.loadNextPage()
+		this.infScroll.on( 'request', path => {
+			// todo update totalUsers here
+		} )
 	},
 	destroyed() {
 		this.infScroll.destroy()
@@ -65,7 +68,6 @@ export default {
 			this.infScroll.loadNextPage()
 		},
 		getPath() {
-			// todo update totalUsers here
 			if ( this.users.length === this.totalUsers ) return
 			return `http://localhost:8001/users?limit=${this.limitItemPerPage}&skip=${(this.currentPage - 1)*this.limitItemPerPage}`
 		},

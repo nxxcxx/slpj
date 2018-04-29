@@ -5,9 +5,17 @@ var Schema = mongoose.Schema
 var userSchema = new Schema( {
 	email: { type: String, required: true },
 	password: { type: String, required: true },
-	line: { type: String, default: '' },
+	line: { type: String },
 	comments: [ { type: Schema.Types.ObjectId, ref: 'comment' } ],
-	images: [ { type: Schema.Types.ObjectId, ref: 'image' } ]
+	images: [ { type: Schema.Types.ObjectId, ref: 'image' } ],
+	gender: { type: String },
+	weight: { type: Number },
+	height: { type: Number },
+	age: { type: Number },
+	cost: { type: Number },
+	details: { type: String },
+	active: { type: Boolean, default: false },
+	location: { type: Schema.Types.Mixed, default: { lat: 0, lng: 0 } }
 } )
 
 userSchema.pre( 'save', function ( next ) {

@@ -5,7 +5,7 @@ const PRIVATE_KEY = require( 'fs' ).readFileSync( __dirname + '/private.key' )
 
 function sign( payload ) {
 	return jwt.sign( payload, PRIVATE_KEY, {
-		expiresIn: 3600
+		expiresIn: 31536000
 	} )
 }
 
